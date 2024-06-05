@@ -1,4 +1,5 @@
 # Miscellaneous
+*.exe
 *.class
 *.log
 *.pyc
@@ -41,3 +42,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+firebase.exe

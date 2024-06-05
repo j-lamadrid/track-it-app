@@ -36,6 +36,14 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
 
+  flutter_login:
+  font_awesome_flutter: ^10.0.0
+  firebase_auth: ^4.20.0
+  cloud_firestore:
+  firebase_core: ^2.32.0
+  animated_text_kit:
+  edge_alerts:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,6 +76,7 @@ flutter:
     - lib/images/strategy.png
     - lib/images/trends.png
     - lib/images/turn_taking.png
+    - lib/images/health_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
