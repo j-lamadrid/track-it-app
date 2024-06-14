@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:track_it/auth_gate.dart';
-import 'package:track_it/pages/home.dart';
-import 'package:track_it/pages/login_screen.dart';
 import 'package:track_it/pages/transition_route_observer.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:track_it/pages/trends.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
