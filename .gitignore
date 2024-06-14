@@ -3,6 +3,8 @@
 *.class
 *.log
 *.pyc
+*.txt
+*.json
 *.swp
 .DS_Store
 .atom/
@@ -44,3 +46,4 @@ app.*.map.json
 /android/app/release
 
 firebase.exe
+firebase*
