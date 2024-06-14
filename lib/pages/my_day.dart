@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/home.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class MyDayPage extends StatefulWidget {
   const MyDayPage({super.key, required this.title});
@@ -51,6 +50,27 @@ class _MyDayPage extends State<MyDayPage> {
                   context,
                   MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Home Page')),
                 );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showErrorDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Prevents dialog from being dismissed by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Submission Unsuccessful'),
+          content: const Text('Please enter valid numerical entries rounded to the nearest whole number.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
               },
             ),
           ],
@@ -265,13 +285,21 @@ class _MyDayPage extends State<MyDayPage> {
                       ),
                       onPressed: () async {
                         try {
-                          // Collect user data
                           Map<String, dynamic> userData = {};
                           for (int i = 0; i < _options.length; i++) {
-                            userData[_options[i]] = {
-                              'TimeSpent': _timeControllers[i].text,
-                              'TurnsTaken': _turnsControllers[i].text,
-                            };
+                            if (_checked[i] == true) {
+                              userData[_options[i]] = {
+                                'TimeSpent': int.parse(
+                                    _timeControllers[i].text),
+                                'TurnsTaken': int.parse(
+                                    _turnsControllers[i].text),
+                              };
+                            } else {
+                              userData[_options[i]] = {
+                                'TimeSpent': null,
+                                'TurnsTaken': null,
+                              };
+                            }
                           }
 
                           User? currUser = FirebaseAuth.instance.currentUser;
@@ -284,19 +312,20 @@ class _MyDayPage extends State<MyDayPage> {
                           var formatter = DateFormat('yyyy-MM-dd');
                           String formattedDate = formatter.format(now);
 
-                          Map<String, dynamic> jsonMap = {
-                            '${userId}_$formattedDate': userData,
+                          Map<String, Map<String, dynamic>> jsonMap = {
+                            formattedDate: userData
                           };
                           print(jsonEncode(jsonMap));
 
                           await FirebaseFirestore.instance
                               .collection('times_of_day')
-                              .doc('${userId}_$formattedDate')
-                              .set(userData, SetOptions(merge: true));
+                              .doc(userId)
+                              .set(jsonMap, SetOptions(merge: true));
 
                           await _showSubmissionDialog();
                         } catch (e) {
                           print('An error occurred: $e');
+                          await _showErrorDialog();
                         }
                       },
                       child: const Text(

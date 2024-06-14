@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:track_it/pages/home.dart';
@@ -13,17 +15,65 @@ class TrendsPage extends StatefulWidget {
 }
 
 class _TrendsPageState extends State<TrendsPage> {
-  // Dummy data for demonstration purposes
-  final List<Map<String, dynamic>> data = [
-    {'date': '2024-06-01', 'turnsTaken': 8, 'timeSpent': 20},
-    {'date': '2024-06-02', 'turnsTaken': 6, 'timeSpent': 15},
-    {'date': '2024-06-03', 'turnsTaken': 10, 'timeSpent': 30},
-    {'date': '2024-06-04', 'turnsTaken': 12, 'timeSpent': 45},
-    {'date': '2024-06-05', 'turnsTaken': 14, 'timeSpent': 30},
-  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAndProcessData();
+  }
+
+  List<Map<String, dynamic>> _fetchAndProcessData() {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      String userId = user!.uid;
+      DatabaseReference dayData = FirebaseDatabase.instance.ref('times_of_day');
+      Query userData = dayData.child(userId).orderByKey().limitToLast(10);
+
+      DatabaseEvent snapshot = userData.once() as DatabaseEvent;
+      Map<String, dynamic> data = Map<String, dynamic>.from(snapshot.snapshot as Map);
+
+      List<Map<String, dynamic>> processedData = _processData(data);
+
+      return processedData;
+
+    } catch (e) {
+      print("Error fetching data: $e");
+      List<Map<String, dynamic>> result = [];
+      return result;
+    }
+  }
+
+  List<Map<String, dynamic>> _processData(Map<String, dynamic> data) {
+    List<Map<String, dynamic>> result = [];
+
+    data.forEach((date, activities) {
+      int turnsTaken = 0;
+      int timeSpent = 0;
+
+      activities.forEach((activityKey, activityValue) {
+        if (activityValue["TurnsTaken"] != null) {
+          turnsTaken += activityValue["TurnsTaken"] as int;
+        }
+        if (activityValue["TimeSpent"] != null) {
+          timeSpent += activityValue["TimeSpent"] as int;
+        }
+      });
+
+      result.add({
+        'date': date,
+        'turnsTaken': turnsTaken,
+        'timeSpent': timeSpent,
+      });
+    });
+
+    result.sort((a, b) => b['date'].compareTo(a['date']));
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> data = _fetchAndProcessData();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trends'),
@@ -78,8 +128,8 @@ class _TrendsPageState extends State<TrendsPage> {
                 dataSource: data,
                 color: Colors.grey,
                 xValueMapper: (datum, _) => datum['date'] as String,
-                yValueMapper: (datum, _) => datum['timeSpent'] as num,
-                name: 'Time Spent (mins)',
+                yValueMapper: (datum, _) => (datum['timeSpent'] / 60).round(2) as num,
+                name: 'Time Spent (hours)',
                 dataLabelSettings: const DataLabelSettings(isVisible: true),
               ),
             ],
