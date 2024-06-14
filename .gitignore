@@ -47,3 +47,4 @@ app.*.map.json
 
 firebase.exe
 firebase*
+firebase.json
