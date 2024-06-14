@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:track_it/auth_gate.dart';
 import 'package:track_it/pages/home.dart';
 import 'package:track_it/pages/login_screen.dart';
 import 'package:track_it/pages/transition_route_observer.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import 'firebase_options.dart';
+import 'package:track_it/pages/trends.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 
@@ -18,6 +25,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TrackiT!',
       theme: ThemeData(
+        primaryColor: Colors.black,
+        colorScheme: const ColorScheme(
+            primary: Colors.black,
+            brightness: Brightness.light,
+            onPrimary: Colors.white,
+            onSecondary: Colors.white,
+            secondary: Colors.white,
+            error: Colors.yellow,
+            onError: Colors.yellow,
+            surface: Colors.white,
+            onSurface: Colors.black,
+        ),
         textSelectionTheme:
         const TextSelectionThemeData(cursorColor: Colors.black),
         // fontFamily: 'SourceSansPro',
@@ -64,7 +83,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       navigatorObservers: [TransitionRouteObserver()],
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
   }
 }

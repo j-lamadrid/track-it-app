@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/chat.dart';
 import 'package:track_it/pages/chatter_screen.dart';
@@ -5,6 +6,7 @@ import 'package:track_it/pages/my_day.dart';
 import 'package:track_it/pages/trends.dart';
 import 'package:track_it/pages/contact.dart';
 import 'package:track_it/pages/strategy.dart';
+import 'package:track_it/pages/login_screen.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -36,7 +38,31 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-
+      appBar: AppBar(
+        title: const Text(''),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+          ),
+        ],
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blueAccent[100]!, Colors.blueAccent[100]!], // Adjust color shades as desired
+              begin: Alignment.topLeft, // Change for different gradient directions
+              end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
       body: Center(
         child: Container(
           decoration: BoxDecoration(
@@ -159,6 +185,68 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.all(0),
                       child: IconButton(
                         icon: const ImageIcon(
+                          AssetImage('lib/images/manual.png'),
+                        ),
+                        onPressed: () {
+                          return;
+                        },
+                        iconSize: 60.0,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        '   ASE Strategies    ',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '   ASE Manual     ',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ]
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Space buttons evenly
+                  children: [
+                    Container(
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white60,
+                        borderRadius: BorderRadius.circular(20), // Rounded corners
+                      ),
+                      padding: const EdgeInsets.all(0),
+                      child: IconButton(
+                        icon: const ImageIcon(
+                          AssetImage('lib/images/goals.png'),
+                        ),
+                        onPressed: () {
+                          return;
+                        },
+                        iconSize: 60.0,
+                      ),
+                    ),
+                    Container(
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white60,
+                        borderRadius: BorderRadius.circular(20), // Rounded corners
+                      ),
+                      padding: const EdgeInsets.all(0),
+                      child: IconButton(
+                        icon: const ImageIcon(
                           AssetImage('lib/images/contact.png'),
                         ),
                         onPressed: () {
@@ -177,14 +265,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        '  ASE Strategies    ',
+                        '      Goals      ',
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '  Contact Us     ',
+                        '    Contact Us ',
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.black,

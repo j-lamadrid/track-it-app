@@ -1,5 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/home.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MyDayPage extends StatefulWidget {
   const MyDayPage({super.key, required this.title});
@@ -22,11 +28,36 @@ class _MyDayPage extends State<MyDayPage> {
     'At the park',
     'Lunch Time',
     'At the store',
-    'Dinner time',
+    'Dinner Time',
     'Bed Time',
     'Story time',
     'Other',
   ];
+
+  Future<void> _showSubmissionDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Prevents dialog from being dismissed by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Submission Successful'),
+          content: const Text('Your data has been successfully submitted.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Home Page')),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,12 +263,40 @@ class _MyDayPage extends State<MyDayPage> {
                           backgroundColor: WidgetStateProperty.all<Color>(Colors.white70),
                           foregroundColor: WidgetStateProperty.all<Color>(Colors.white70),
                       ),
-                      onPressed: () {
-                        // Handle submit action
-                        for (int i = 0; i < _options.length; i++) {
-                          if (_checked[i]) {
-                            print('Activity: ${_options[i]}, Time Spent: ${_timeControllers[i].text}, Turns Taken: ${_turnsControllers[i].text}');
+                      onPressed: () async {
+                        try {
+                          // Collect user data
+                          Map<String, dynamic> userData = {};
+                          for (int i = 0; i < _options.length; i++) {
+                            userData[_options[i]] = {
+                              'TimeSpent': _timeControllers[i].text,
+                              'TurnsTaken': _turnsControllers[i].text,
+                            };
                           }
+
+                          User? currUser = FirebaseAuth.instance.currentUser;
+                          if (currUser == null) {
+                            throw Exception('User is not signed in');
+                          }
+
+                          String userId = currUser.uid;
+                          var now = DateTime.now();
+                          var formatter = DateFormat('yyyy-MM-dd');
+                          String formattedDate = formatter.format(now);
+
+                          Map<String, dynamic> jsonMap = {
+                            '${userId}_$formattedDate': userData,
+                          };
+                          print(jsonEncode(jsonMap));
+
+                          await FirebaseFirestore.instance
+                              .collection('times_of_day')
+                              .doc('${userId}_$formattedDate')
+                              .set(userData, SetOptions(merge: true));
+
+                          await _showSubmissionDialog();
+                        } catch (e) {
+                          print('An error occurred: $e');
                         }
                       },
                       child: const Text(

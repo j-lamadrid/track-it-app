@@ -1,9 +1,10 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_login/flutter_login.dart';
 import 'package:track_it/pages/custom_route.dart';
 import 'package:track_it/pages/home.dart';
-import 'package:track_it/pages/users.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 
@@ -27,16 +28,17 @@ class _LoginScreen extends State<LoginScreen> {
           email: data.name,
           password: data.password,
         );
+        return 'User logged in successfully';
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
-          print('No user found for that email');
+          return 'No user found for that email';
         } else if (e.code == 'wrong-password') {
-          print('Wrong password provided for that user');
+          return 'Wrong password provided for that user';
         }
+        return e.toString();
       } catch (e) {
-        print(e);
+        return 'An error occurred: ${e.toString()}';
       }
-      return null;
     });
   }
 
@@ -49,12 +51,12 @@ class _LoginScreen extends State<LoginScreen> {
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          print('The password provided is too weak');
+          return 'The password provided is too weak';
         } else if (e.code == 'email-already-in-use') {
-          print('The account already exists for that email');
+          return 'The account already exists for that email';
         }
       } catch (e) {
-        print(e);
+        return e.toString();
       }
       return null;
     });
@@ -88,28 +90,8 @@ class _LoginScreen extends State<LoginScreen> {
             logo: const AssetImage('lib/images/health_logo.png',),
             navigateBackAfterRecovery: true,
             onConfirmRecover: _signupConfirm,
-            onConfirmSignup: _signupConfirm,
+            //onConfirmSignup: _signupConfirm,
             loginAfterSignUp: false,
-            additionalSignupFields: [
-              const UserFormField(keyName: 'First Name'),
-              const UserFormField(keyName: 'Last Name'),
-              UserFormField(
-                keyName: 'phone_number',
-                displayName: 'Phone Number',
-                userType: LoginUserType.phone,
-                fieldValidator: (value) {
-                  final phoneRegExp = RegExp(
-                    '^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}\$',
-                  );
-                  if (value != null &&
-                      value.length < 7 &&
-                      !phoneRegExp.hasMatch(value)) {
-                    return "This isn't a valid phone number";
-                  }
-                  return null;
-                },
-              ),
-            ],
             userValidator: (value) {
               if ((!value!.contains('@')) || (!value.endsWith('.com') && !value.endsWith('.edu'))) {
                 return "Email must contain '@' and end with '.com' or '.edu'";
@@ -132,10 +114,7 @@ class _LoginScreen extends State<LoginScreen> {
               debugPrint('Signup info');
               debugPrint('Email: ${signupData.name}');
               debugPrint('Password: ${signupData.password}');
-
-              signupData.additionalSignupData?.forEach((key, value) {
-                debugPrint('$key: $value');
-              });
+              
               if (signupData.termsOfService.isNotEmpty) {
                 debugPrint('Terms of service: ');
                 for (final element in signupData.termsOfService) {
@@ -200,9 +179,7 @@ class IntroWidget extends StatelessWidget {
             Expanded(child: Divider()),
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text("Authenticate"),
             ),
-            Expanded(child: Divider()),
           ],
         ),
       ],
