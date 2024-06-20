@@ -41,7 +41,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
           description: e.toString(),
           gravity: Gravity.bottom,
           icon: Icons.error,
-          backgroundColor: Colors.deepPurple[900]);
+          backgroundColor: Colors.black);
     }
   }
 
@@ -105,14 +105,13 @@ class _ChatterScreenState extends State<ChatterScreen> {
                     ),
                     MaterialButton(
                       shape: const CircleBorder(),
-                      color: Colors.blue,
+                      color: Colors.black,
                       onPressed: () {
                         chatMsgTextController.clear();
                         _firestore.collection('messages').add({
-                          'sender': displayName,
+                          'sender': userID,
                           'text': messageText,
                           'timestamp': DateTime.now().millisecondsSinceEpoch,
-                          'senderemail': email
                         });
                       },
                       child: const Padding(
@@ -132,6 +131,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
 }
 
 class ChatStream extends StatelessWidget {
+  const ChatStream({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -142,11 +143,11 @@ class ChatStream extends StatelessWidget {
           List<MessageBubble> messageWidgets = [];
           for (var message in messages) {
             final msgText = message['text'];
-            final msgSender = message['sender'];
+            final msgSenderId = message['sender'];
             final msgBubble = MessageBubble(
               msgText: msgText,
-              msgSender: msgSender,
-              user: msgSender == displayName,
+              msgSender: email!.split('@')[0],
+              user: msgSenderId == userID,
             );
             messageWidgets.add(msgBubble);
           }
@@ -160,7 +161,7 @@ class ChatStream extends StatelessWidget {
         } else {
           return const Center(
             child: CircularProgressIndicator(
-              backgroundColor: Colors.deepPurple,
+              backgroundColor: Colors.black,
             ),
           );
         }
@@ -187,7 +188,7 @@ class MessageBubble extends StatelessWidget {
             child: Text(
               msgSender,
               style: const TextStyle(
-                  fontSize: 13, fontFamily: 'Poppins', color: Colors.black87),
+                  fontSize: 13, fontFamily: 'OpenSans', color: Colors.black87),
             ),
           ),
           Material(
@@ -197,15 +198,15 @@ class MessageBubble extends StatelessWidget {
               bottomRight: const Radius.circular(50),
               topRight: user ? const Radius.circular(0) : const Radius.circular(50),
             ),
-            color: user ? Colors.blue : Colors.white,
+            color: user ? Colors.white : Colors.grey[300],
             elevation: 5,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Text(
                 msgText,
                 style: TextStyle(
-                  color: user ? Colors.white : Colors.blue,
-                  fontFamily: 'Poppins',
+                  color: user ? Colors.black : Colors.black,
+                  fontFamily: 'OpenSans',
                   fontSize: 15,
                 ),
               ),

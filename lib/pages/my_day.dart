@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyDayPage extends StatefulWidget {
   const MyDayPage({super.key, required this.title});
@@ -32,10 +33,44 @@ class _MyDayPage extends State<MyDayPage> {
     'Other',
   ];
 
+  late SharedPreferences _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedState();
+  }
+
+  void _loadSavedState() async {
+    _prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      for (int i = 0; i < _options.length; i++) {
+        _checked[i] = _prefs.getBool('checked_$i') ?? false;
+        _timeControllers[i].text = _prefs.getString('time_$i') ?? '';
+        _turnsControllers[i].text = _prefs.getString('turns_$i') ?? '';
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _saveState();
+    super.dispose();
+  }
+
+  void _saveState() {
+    for (int i = 0; i < _options.length; i++) {
+      _prefs.setBool('checked_$i', _checked[i]);
+      _prefs.setString('time_$i', _timeControllers[i].text);
+      _prefs.setString('turns_$i', _turnsControllers[i].text);
+    }
+  }
+
   Future<void> _showSubmissionDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // Prevents dialog from being dismissed by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Submission Successful'),
@@ -44,7 +79,7 @@ class _MyDayPage extends State<MyDayPage> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Home Page')),
