@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/home.dart';
 
-class StrategyPage extends StatefulWidget {
-  const StrategyPage({super.key, required this.title});
+class ManualPage extends StatefulWidget {
+  const ManualPage({super.key});
 
-  final String title;
 
   @override
-  State<StrategyPage> createState() => _StrategyPage();
+  State<ManualPage> createState() => _ManualPage();
 }
 
-class _StrategyPage extends State<StrategyPage> {
+class _ManualPage extends State<ManualPage> {
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class _StrategyPage extends State<StrategyPage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ASE Strategies'),
+        title: const Text('ASE Manual'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

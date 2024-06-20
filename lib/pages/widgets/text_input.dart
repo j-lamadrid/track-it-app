@@ -22,7 +22,7 @@ class CustomTextInput extends StatelessWidget {
       padding: const EdgeInsets.only(left: 10),
       width: MediaQuery.of(context).size.width * 0.70,
       child: TextField(
-        onChanged: userTyped,
+        onChanged: (value) {},
         keyboardType: keyboard,
         onSubmitted: (value) {},
         autofocus: false,

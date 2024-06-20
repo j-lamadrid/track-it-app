@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/chat.dart';
 import 'package:track_it/pages/chatter_screen.dart';
+import 'package:track_it/pages/goals.dart';
+import 'package:track_it/pages/manual.dart';
 import 'package:track_it/pages/my_day.dart';
 import 'package:track_it/pages/trends.dart';
 import 'package:track_it/pages/contact.dart';
@@ -39,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: const Text('TrackiT'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -188,7 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           AssetImage('lib/images/manual.png'),
                         ),
                         onPressed: () {
-                          return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ManualPage()),
+                          );
                         },
                         iconSize: 60.0,
                       ),
@@ -232,7 +237,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           AssetImage('lib/images/goals.png'),
                         ),
                         onPressed: () {
-                          return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const GoalsPage()),
+                          );
                         },
                         iconSize: 60.0,
                       ),

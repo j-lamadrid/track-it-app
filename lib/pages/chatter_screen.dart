@@ -5,9 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:track_it/pages/widgets/constants.dart';
 
 final _firestore = FirebaseFirestore.instance;
-String username = 'User';
-String email = 'user@example.com';
+final _user = FirebaseAuth.instance.currentUser!;
+String userID = _user.uid;
+String? email = _user.email;
 String messageText = '';
+String? displayName = '';
 
 class ChatterScreen extends StatefulWidget {
   const ChatterScreen({super.key});
@@ -30,7 +32,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
     try {
       final user = _auth.currentUser!;
       setState(() {
-        username = user.displayName ?? 'User';
+        displayName = user.email!;
         email = user.email!;
       });
     } catch (e) {
@@ -107,7 +109,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
                       onPressed: () {
                         chatMsgTextController.clear();
                         _firestore.collection('messages').add({
-                          'sender': username,
+                          'sender': displayName,
                           'text': messageText,
                           'timestamp': DateTime.now().millisecondsSinceEpoch,
                           'senderemail': email
@@ -144,7 +146,7 @@ class ChatStream extends StatelessWidget {
             final msgBubble = MessageBubble(
               msgText: msgText,
               msgSender: msgSender,
-              user: msgSender == username,
+              user: msgSender == displayName,
             );
             messageWidgets.add(msgBubble);
           }
