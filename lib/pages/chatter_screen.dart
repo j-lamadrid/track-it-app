@@ -79,7 +79,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ChatStream(),
+              const ChatStream(),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 decoration: kMessageContainerDecoration,

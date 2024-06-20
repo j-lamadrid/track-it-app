@@ -1,13 +1,12 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:track_it/pages/home.dart';
 
 class TrendsPage extends StatefulWidget {
-  const TrendsPage({Key? key, required this.title}) : super(key: key);
+  const TrendsPage({super.key, required this.title});
 
   final String title;
 
