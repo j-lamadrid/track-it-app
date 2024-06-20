@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,8 @@ class TrendsPage extends StatefulWidget {
 }
 
 class _TrendsPageState extends State<TrendsPage> {
+  List<Map<String, dynamic>> _data = [];
+  bool _loading = true;
 
   @override
   void initState() {
@@ -21,24 +25,35 @@ class _TrendsPageState extends State<TrendsPage> {
     _fetchAndProcessData();
   }
 
-  List<Map<String, dynamic>> _fetchAndProcessData() {
+  double dp(double val, int places){
+    num mod = pow(10.0, places);
+    return ((val * mod).round().toDouble() / mod);
+  }
+
+  Future<void> _fetchAndProcessData() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      String userId = user!.uid;
-      DatabaseReference dayData = FirebaseDatabase.instance.ref('times_of_day');
-      Query userData = dayData.child(userId).orderByKey().limitToLast(10);
+      if (user != null) {
+        String userId = user.uid;
+        CollectionReference ref = FirebaseFirestore.instance.collection('times_of_day');
+        DocumentSnapshot<Map<String, dynamic>> userRef = await ref.doc(userId).get() as DocumentSnapshot<Map<String, dynamic>>;
+        Map<String, dynamic> data = userRef.data() as Map<String, dynamic>;
+        List<Map<String, dynamic>> processedData = _processData(data);
 
-      DatabaseEvent snapshot = userData.once() as DatabaseEvent;
-      Map<String, dynamic> data = Map<String, dynamic>.from(snapshot.snapshot as Map);
-
-      List<Map<String, dynamic>> processedData = _processData(data);
-
-      return processedData;
-
+        setState(() {
+          _data = processedData;
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _loading = false;
+        });
+      }
     } catch (e) {
       print("Error fetching data: $e");
-      List<Map<String, dynamic>> result = [];
-      return result;
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -49,7 +64,7 @@ class _TrendsPageState extends State<TrendsPage> {
       int turnsTaken = 0;
       int timeSpent = 0;
 
-      activities.forEach((activityKey, activityValue) {
+      (activities as Map).forEach((activityKey, activityValue) {
         if (activityValue["TurnsTaken"] != null) {
           turnsTaken += activityValue["TurnsTaken"] as int;
         }
@@ -64,15 +79,17 @@ class _TrendsPageState extends State<TrendsPage> {
         'timeSpent': timeSpent,
       });
     });
-
-    result.sort((a, b) => b['date'].compareTo(a['date']));
+    result.sort((a, b) => a['date'].compareTo(b['date']));
+    int start = result.length - 8;
+    if (start < 0) {
+      start = 0;
+    }
+    result = result.sublist(start, result.length);
     return result;
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> data = _fetchAndProcessData();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trends'),
@@ -88,19 +105,21 @@ class _TrendsPageState extends State<TrendsPage> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blueAccent[100]!, Colors.blueAccent[100]!], // Adjust color shades as desired
-              begin: Alignment.topLeft, // Change for different gradient directions
+              colors: [Colors.blueAccent[100]!, Colors.blueAccent[100]!],
+              begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
       ),
       body: Center(
-        child: Container(
+        child: _loading
+            ? const CircularProgressIndicator()
+            : Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blueAccent[100]!, Colors.yellow[100]!], // Adjust color shades as desired
-              begin: Alignment.topLeft, // Change for different gradient directions
+              colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
+              begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
@@ -108,15 +127,15 @@ class _TrendsPageState extends State<TrendsPage> {
             legend: const Legend(isVisible: true),
             plotAreaBackgroundColor: Colors.transparent,
             primaryXAxis: const CategoryAxis(
-              labelRotation: 45, // Rotate x-axis labels by 45 degrees
+              labelRotation: 45,
             ),
             primaryYAxis: const NumericAxis(
-              title: AxisTitle(text: 'Count'), // Add y-axis label
+              title: AxisTitle(text: 'Count'),
             ),
             title: const ChartTitle(text: 'Trends in Turn Taking'),
             series: <LineSeries<Map<String, dynamic>, String>>[
               LineSeries<Map<String, dynamic>, String>(
-                dataSource: data,
+                dataSource: _data,
                 color: Colors.black,
                 xValueMapper: (datum, _) => datum['date'] as String,
                 yValueMapper: (datum, _) => datum['turnsTaken'] as num,
@@ -124,10 +143,10 @@ class _TrendsPageState extends State<TrendsPage> {
                 dataLabelSettings: const DataLabelSettings(isVisible: true),
               ),
               LineSeries<Map<String, dynamic>, String>(
-                dataSource: data,
+                dataSource: _data,
                 color: Colors.grey,
                 xValueMapper: (datum, _) => datum['date'] as String,
-                yValueMapper: (datum, _) => (datum['timeSpent'] / 60).round(2) as num,
+                yValueMapper: (datum, _) => dp((datum['timeSpent'] / 60), 2),
                 name: 'Time Spent (hours)',
                 dataLabelSettings: const DataLabelSettings(isVisible: true),
               ),

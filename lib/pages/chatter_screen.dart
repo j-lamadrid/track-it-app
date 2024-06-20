@@ -9,7 +9,7 @@ final _user = FirebaseAuth.instance.currentUser!;
 String userID = _user.uid;
 String? email = _user.email;
 String messageText = '';
-String? displayName = '';
+String? displayName = email?.split('@')[0];
 
 class ChatterScreen extends StatefulWidget {
   const ChatterScreen({super.key});
@@ -32,8 +32,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
     try {
       final user = _auth.currentUser!;
       setState(() {
-        displayName = user.email!;
         email = user.email!;
+        displayName = email?.split('@')[0];
       });
     } catch (e) {
       edgeAlert(context,
