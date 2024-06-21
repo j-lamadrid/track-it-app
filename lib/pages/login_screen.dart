@@ -73,6 +73,17 @@ class _LoginScreen extends State<LoginScreen> {
 
   Future<String?> _signupConfirm(String error, LoginData data) {
     return Future.delayed(loginTime).then((_) {
+      try {
+        FirebaseAuth.instance.sendSignInLinkToEmail(
+            email: data.name, actionCodeSettings: ActionCodeSettings(url: url,
+            handleCodeInApp: true,
+            iOSBundleId: 'com.example.trackIt',
+            androidPackageName: 'com.trackit.app',
+            androidInstallApp: true,
+        ));
+      } catch (e) {
+        print(e);
+      }
       return null;
     });
   }
@@ -88,7 +99,7 @@ class _LoginScreen extends State<LoginScreen> {
             logo: const AssetImage('lib/images/health_logo.png',),
             navigateBackAfterRecovery: true,
             onConfirmRecover: _signupConfirm,
-            //onConfirmSignup: _signupConfirm,
+            onConfirmSignup: _signupConfirm,
             loginAfterSignUp: false,
             userValidator: (value) {
               if ((!value!.contains('@')) || (!value.endsWith('.com') && !value.endsWith('.edu'))) {
@@ -106,7 +117,7 @@ class _LoginScreen extends State<LoginScreen> {
               debugPrint('Login info');
               debugPrint('Email: ${loginData.name}');
               debugPrint('Password: ${loginData.password}');
-              return _loginUser(loginData);
+              _loginUser(loginData);
             },
             onSignup: (signupData) {
               debugPrint('Signup info');
@@ -121,7 +132,7 @@ class _LoginScreen extends State<LoginScreen> {
                   );
                 }
               }
-              return _signupUser(signupData);
+              _signupUser(signupData);
             },
             onSubmitAnimationCompleted: () {
               Navigator.of(context).pushReplacement(

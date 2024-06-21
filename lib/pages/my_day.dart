@@ -34,6 +34,7 @@ class _MyDayPage extends State<MyDayPage> {
   ];
 
   late SharedPreferences _prefs;
+  final String _dateKey = 'last_saved_date';
 
   @override
   void initState() {
@@ -43,14 +44,31 @@ class _MyDayPage extends State<MyDayPage> {
 
   void _loadSavedState() async {
     _prefs = await SharedPreferences.getInstance();
+    String? lastSavedDate = _prefs.getString(_dateKey);
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-    setState(() {
-      for (int i = 0; i < _options.length; i++) {
-        _checked[i] = _prefs.getBool('checked_$i') ?? false;
-        _timeControllers[i].text = _prefs.getString('time_$i') ?? '';
-        _turnsControllers[i].text = _prefs.getString('turns_$i') ?? '';
-      }
-    });
+    if (lastSavedDate == today) {
+      // Load the saved state if the date matches today
+      setState(() {
+        for (int i = 0; i < _options.length; i++) {
+          _checked[i] = _prefs.getBool('checked_$i') ?? false;
+          _timeControllers[i].text = _prefs.getString('time_$i') ?? '';
+          _turnsControllers[i].text = _prefs.getString('turns_$i') ?? '';
+        }
+      });
+    } else {
+      // Clear stale data if the date does not match
+      _clearSavedState();
+    }
+  }
+
+  void _clearSavedState() {
+    for (int i = 0; i < _options.length; i++) {
+      _prefs.remove('checked_$i');
+      _prefs.remove('time_$i');
+      _prefs.remove('turns_$i');
+    }
+    _prefs.remove(_dateKey);
   }
 
   @override
@@ -60,6 +78,9 @@ class _MyDayPage extends State<MyDayPage> {
   }
 
   void _saveState() {
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    _prefs.setString(_dateKey, today);
+
     for (int i = 0; i < _options.length; i++) {
       _prefs.setBool('checked_$i', _checked[i]);
       _prefs.setString('time_$i', _timeControllers[i].text);
@@ -104,7 +125,7 @@ class _MyDayPage extends State<MyDayPage> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -236,6 +257,7 @@ class _MyDayPage extends State<MyDayPage> {
                                   onChanged: (bool? value) {
                                     setState(() {
                                       _checked[index] = value ?? false;
+                                      _saveState();
                                     });
                                   },
                                   activeColor: Colors.white30,
@@ -269,6 +291,9 @@ class _MyDayPage extends State<MyDayPage> {
                                     hoverColor: Colors.black12,
                                   ),
                                   keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    _saveState();
+                                  },
                                   style: const TextStyle(
                                     fontSize: 14,
                                   ),
@@ -298,6 +323,9 @@ class _MyDayPage extends State<MyDayPage> {
                                     hoverColor: Colors.black12,
                                   ),
                                   keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    _saveState();
+                                  },
                                   style: const TextStyle(
                                     fontSize: 14,
                                   ),
