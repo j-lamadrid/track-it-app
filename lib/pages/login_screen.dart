@@ -34,7 +34,7 @@ class _LoginScreen extends State<LoginScreen> {
         }
         LoginScreen.loggedIn = true;
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
+        if (e.code == 'user-not-found') {
           print('No user found');
           return 'No user found';
         } else if (e.code == 'wrong-password') {

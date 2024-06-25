@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:track_it/pages/chatter_screen.dart';
+import 'package:track_it/pages/chat.dart';
 import 'package:track_it/pages/goals.dart';
 import 'package:track_it/pages/manual.dart';
 import 'package:track_it/pages/my_day.dart';

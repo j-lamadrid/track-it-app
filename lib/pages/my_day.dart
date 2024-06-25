@@ -57,7 +57,6 @@ class _MyDayPage extends State<MyDayPage> {
         }
       });
     } else {
-      // Clear stale data if the date does not match
       _clearSavedState();
     }
   }
