@@ -3,12 +3,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:track_it/pages/widgets/constants.dart';
+import 'package:track_it/pages/home.dart';
+
+
+// new message structure :
+// Doc - userId -> messages -> sender (bool) + time + content
+// Doc - psychId -> patients -> id -> messages -> sender (bool) + time + content
 
 final _firestore = FirebaseFirestore.instance;
 final _user = FirebaseAuth.instance.currentUser!;
-String userID = _user.uid;
+String userId = _user.uid;
 String? email = _user.email;
 String messageText = '';
+String psychId = '';
 String? displayName = email?.split('@')[0];
 
 class ChatterScreen extends StatefulWidget {
@@ -21,7 +28,6 @@ class ChatterScreen extends StatefulWidget {
 class _ChatterScreenState extends State<ChatterScreen> {
   final chatMsgTextController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  late String psychId;
 
   @override
   void initState() {
@@ -48,19 +54,44 @@ class _ChatterScreenState extends State<ChatterScreen> {
   }
 
   void getPsychId() async {
+    CollectionReference ref = FirebaseFirestore.instance.collection('provider');
+
     try {
-      // final userDoc = await _firestore.collection('users').doc(userID).get();
+      DocumentSnapshot userRef = await ref.doc(userId).get();
+      Map<String, dynamic>? data = userRef.data() as Map<String, dynamic>?;
+      String? psychData = data?['psychId'];
+
       setState(() {
-        psychId = 'psychId'; //userDoc.data()!['psychologistId'];
+        psychId = psychData ?? '';
       });
     } catch (e) {
-      edgeAlert(context,
-          title: 'Something Went Wrong',
-          description: e.toString(),
-          gravity: Gravity.bottom,
-          icon: Icons.error,
-          backgroundColor: Colors.black);
+      print('Error getting psychId: $e');
+      setState(() {
+        psychId = '';
+      });
     }
+  }
+
+
+  Future<void> _showErrorDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Service Unavailable'),
+          content: const Text('You are not yet connected with a provider in our system. Please contact us at ___@___.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -125,10 +156,13 @@ class _ChatterScreenState extends State<ChatterScreen> {
                       shape: const CircleBorder(),
                       color: Colors.black,
                       onPressed: () {
+                        if (psychId.isEmpty) {
+                          _showErrorDialog();
+                          throw Exception();
+                        }
                         chatMsgTextController.clear();
                         _firestore.collection('messages').add({
-                          'sender': userID,
-                          'senderEmail': email,
+                          'sender': userId,
                           'text': messageText,
                           'timestamp': DateTime.now().millisecondsSinceEpoch,
                           'receiver': psychId,
@@ -164,14 +198,25 @@ class ChatStream extends StatelessWidget {
           for (var message in messages) {
             final msgText = message['text'];
             final msgSenderId = message['sender'];
-            final msgSenderEmail = message['senderEmail'];
-            final msgSenderPrefix = msgSenderEmail.split('@')[0];
-            final msgBubble = MessageBubble(
-              msgText: msgText,
-              msgSender: msgSenderPrefix,
-              user: msgSenderId == userID,
-            );
-            messageWidgets.add(msgBubble);
+            final msgReceiverId = message['receiver'];
+            MessageBubble msgBubble;
+
+            if (msgSenderId == userId || msgReceiverId == userId){
+              if (msgSenderId == userId) {
+                msgBubble = MessageBubble(
+                  msgText: msgText,
+                  msgSender: 'Parent',
+                  user: true,
+                );
+              } else {
+                msgBubble = MessageBubble(
+                  msgText: msgText,
+                  msgSender: 'Psychologist',
+                  user: false,
+                );
+              }
+              messageWidgets.add(msgBubble);
+            }
           }
           return Expanded(
             child: ListView(

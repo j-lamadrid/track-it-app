@@ -46,6 +46,7 @@ class _LoginScreen extends State<LoginScreen> {
         print(e);
         return 'An error occurred: ${e.toString()}';
       }
+      return null;
     });
   }
 

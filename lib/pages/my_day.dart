@@ -285,7 +285,7 @@ class _MyDayPage extends State<MyDayPage> {
                                     disabledBorder: OutlineInputBorder(borderSide:
                                     BorderSide(color: Colors.black)
                                     ),
-                                    contentPadding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 3.0),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                                     fillColor: Colors.white10,
                                     hoverColor: Colors.black12,
                                   ),
@@ -317,7 +317,7 @@ class _MyDayPage extends State<MyDayPage> {
                                     disabledBorder: OutlineInputBorder(borderSide:
                                     BorderSide(color: Colors.black)
                                     ),
-                                    contentPadding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 3.0),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                                     fillColor: Colors.white10,
                                     hoverColor: Colors.black12,
                                   ),
