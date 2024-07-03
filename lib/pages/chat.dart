@@ -7,8 +7,14 @@ import 'package:track_it/pages/home.dart';
 
 
 // new message structure :
-// Doc - userId -> messages -> sender (bool) + time + content
-// Doc - psychId -> patients -> id -> messages -> sender (bool) + time + content
+// Doc - channelId (userId) -> (to (id), from (id), time, content)
+// Doc - psychId -> (channelIds)
+
+// channelId == userId
+// psychId -> [uid, uid, uid]
+// messages -> uid -> (senderId, receiverId, time, content)
+// for users: query messages for curr userId
+// for providers: page with all connected users, select then query that users id
 
 final _firestore = FirebaseFirestore.instance;
 final _user = FirebaseAuth.instance.currentUser!;
@@ -80,7 +86,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Service Unavailable'),
-          content: const Text('You are not yet connected with a provider in our system. Please contact us at ___@___.'),
+          content: const Text('You are not yet connected with a provider in our system. '
+              'Please contact us at ___@___.'),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
