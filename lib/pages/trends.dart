@@ -37,8 +37,11 @@ class _TrendsPageState extends State<TrendsPage> {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String userId = user.uid;
-        CollectionReference ref = FirebaseFirestore.instance.collection('times_of_day');
-        DocumentSnapshot<Map<String, dynamic>> userRef = await ref.doc(userId).get() as DocumentSnapshot<Map<String, dynamic>>;
+        CollectionReference ref =
+            FirebaseFirestore.instance.collection('times_of_day');
+        DocumentSnapshot<Map<String, dynamic>> userRef = await ref
+            .doc(userId)
+            .get() as DocumentSnapshot<Map<String, dynamic>>;
         Map<String, dynamic> data = userRef.data() as Map<String, dynamic>;
         List<Map<String, dynamic>> processedData = _processData(data);
 
@@ -73,12 +76,14 @@ class _TrendsPageState extends State<TrendsPage> {
       });
 
       if (_selectedRange == 'Past Year') {
-        String month = date.substring(0, 7); // Get YYYY-MM from date
+        String month = date.substring(0, 7);
         if (!monthlyData.containsKey(month)) {
           monthlyData[month] = {'turnsTaken': 0, 'timeSpent': 0};
         }
-        monthlyData[month]!['turnsTaken'] = monthlyData[month]!['turnsTaken']! + turnsTaken;
-        monthlyData[month]!['timeSpent'] = monthlyData[month]!['timeSpent']! + timeSpent;
+        monthlyData[month]!['turnsTaken'] =
+            monthlyData[month]!['turnsTaken']! + turnsTaken;
+        monthlyData[month]!['timeSpent'] =
+            monthlyData[month]!['timeSpent']! + timeSpent;
       } else {
         result.add({
           'date': date,
@@ -138,8 +143,10 @@ class _TrendsPageState extends State<TrendsPage> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String userId = user.uid;
-      CollectionReference ref = FirebaseFirestore.instance.collection('times_of_day');
-      DocumentSnapshot<Map<String, dynamic>> userRef = await ref.doc(userId).get() as DocumentSnapshot<Map<String, dynamic>>;
+      CollectionReference ref =
+          FirebaseFirestore.instance.collection('times_of_day');
+      DocumentSnapshot<Map<String, dynamic>> userRef =
+          await ref.doc(userId).get() as DocumentSnapshot<Map<String, dynamic>>;
       data = userRef.data() as Map<String, dynamic>;
     }
 
@@ -148,17 +155,15 @@ class _TrendsPageState extends State<TrendsPage> {
     for (var entry in filteredData) {
       (entry['activities'] as Map).forEach((activityKey, activityValue) {
         if (activityValue["TurnsTaken"] != null) {
-          result[options.indexOf(activityKey)] += activityValue["TurnsTaken"] as int;
+          result[options.indexOf(activityKey)] +=
+              activityValue["TurnsTaken"] as int;
         }
       });
     }
 
     for (var i = 0; i < options.length; i++) {
       if (result[i] > 0) {
-        output.add({
-          'option': options[i],
-          'turnsTaken': result[i]
-        });
+        output.add({'option': options[i], 'turnsTaken': result[i]});
       }
     }
 
@@ -207,7 +212,8 @@ class _TrendsPageState extends State<TrendsPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Home Page')),
+              MaterialPageRoute(
+                  builder: (context) => const MyHomePage(title: 'Home Page')),
             );
           },
         ),
@@ -225,106 +231,118 @@ class _TrendsPageState extends State<TrendsPage> {
         child: _loading
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              children: [
-                DropdownButton<String>(
-                  value: _selectedRange,
-                  items: <String>['Past 7 Days', 'Past 30 Days', 'Past Year'].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      setState(() {
-                        _selectedRange = newValue!;
-                        _loading = false;
-                      });
-                      _fetchAndProcessData().then((_) => _loadPieData());
-                    });
-                  },
-                ),
-                SizedBox(
-                  height: 500,
-                  child: SfCartesianChart(
-                    legend: const Legend(isVisible: true),
-                    enableAxisAnimation: true,
-                    plotAreaBackgroundColor: Colors.transparent,
-                    primaryXAxis: const CategoryAxis(
-                      labelRotation: 45,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    primaryYAxis: const NumericAxis(
-                      title: AxisTitle(text: 'Count'),
-                    ),
-                    title: const ChartTitle(text: 'Trends in Turn Taking'),
-                    series: <LineSeries<Map<String, dynamic>, String>>[
-                      LineSeries<Map<String, dynamic>, String>(
-                        dataSource: _data,
-                        color: Colors.black,
-                        xValueMapper: (datum, _) => datum['date'] as String,
-                        yValueMapper: (datum, _) => datum['turnsTaken'] as num,
-                        name: 'Turns Taken',
-                        dataLabelSettings: const DataLabelSettings(isVisible: false),
-                      ),
-                      LineSeries<Map<String, dynamic>, String>(
-                        dataSource: _data,
-                        color: Colors.grey,
-                        xValueMapper: (datum, _) => datum['date'] as String,
-                        yValueMapper: (datum, _) => dp((datum['timeSpent'] / 60), 2),
-                        name: 'Time Spent (hours)',
-                        dataLabelSettings: const DataLabelSettings(isVisible: false),
-                      ),
-                    ],
                   ),
-                ),
-                const SizedBox(height: 75),
-                SizedBox(
-                  height: 350,
-                  child: SfCircularChart(
-                    title: const ChartTitle(text: '# of Turns Taken By Time of Day'),
-                    legend: const Legend(isVisible: true),
-                    palette: <Color>[
-                      Colors.white,
-                      Colors.brown.shade200,
-                      Colors.brown.shade400,
-                      Colors.brown.shade800,
-                      Colors.blue.shade200,
-                      Colors.blue.shade400,
-                      Colors.blue.shade800,
-                      Colors.grey.shade300,
-                      Colors.grey.shade500,
-                      Colors.grey.shade800,
-                      Colors.black
-                    ],
-                    series: <PieSeries<Map<String, dynamic>, String>>[
-                      PieSeries<Map<String, dynamic>, String>(
-                        dataSource: _pieData,
-                        xValueMapper: (datum, _) => datum['option'] as String,
-                        yValueMapper: (datum, _) => datum['turnsTaken'] as int,
-                        dataLabelSettings: const DataLabelSettings(
-                          isVisible: true,
-                          labelPosition: ChartDataLabelPosition.outside,
+                  child: Column(
+                    children: [
+                      DropdownButton<String>(
+                        value: _selectedRange,
+                        items: <String>[
+                          'Past 7 Days',
+                          'Past 30 Days',
+                          'Past Year'
+                        ].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            setState(() {
+                              _selectedRange = newValue!;
+                              _loading = false;
+                            });
+                            _fetchAndProcessData().then((_) => _loadPieData());
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 500,
+                        child: SfCartesianChart(
+                          legend: const Legend(isVisible: true),
+                          enableAxisAnimation: true,
+                          plotAreaBackgroundColor: Colors.transparent,
+                          primaryXAxis: const CategoryAxis(
+                            labelRotation: 45,
+                          ),
+                          primaryYAxis: const NumericAxis(
+                            title: AxisTitle(text: 'Count'),
+                          ),
+                          title:
+                              const ChartTitle(text: 'Trends in Turn Taking'),
+                          series: <LineSeries<Map<String, dynamic>, String>>[
+                            LineSeries<Map<String, dynamic>, String>(
+                              dataSource: _data,
+                              color: Colors.black,
+                              xValueMapper: (datum, _) =>
+                                  datum['date'] as String,
+                              yValueMapper: (datum, _) =>
+                                  datum['turnsTaken'] as num,
+                              name: 'Turns Taken',
+                              dataLabelSettings:
+                                  const DataLabelSettings(isVisible: false),
+                            ),
+                            LineSeries<Map<String, dynamic>, String>(
+                              dataSource: _data,
+                              color: Colors.grey,
+                              xValueMapper: (datum, _) =>
+                                  datum['date'] as String,
+                              yValueMapper: (datum, _) =>
+                                  dp((datum['timeSpent'] / 60), 2),
+                              name: 'Time Spent (hours)',
+                              dataLabelSettings:
+                                  const DataLabelSettings(isVisible: false),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 75),
+                      SizedBox(
+                        height: 350,
+                        child: SfCircularChart(
+                          title: const ChartTitle(
+                              text: '# of Turns Taken By Time of Day'),
+                          legend: const Legend(isVisible: true),
+                          palette: <Color>[
+                            Colors.white,
+                            Colors.brown.shade200,
+                            Colors.brown.shade400,
+                            Colors.brown.shade800,
+                            Colors.blue.shade200,
+                            Colors.blue.shade400,
+                            Colors.blue.shade800,
+                            Colors.grey.shade300,
+                            Colors.grey.shade500,
+                            Colors.grey.shade800,
+                            Colors.black
+                          ],
+                          series: <PieSeries<Map<String, dynamic>, String>>[
+                            PieSeries<Map<String, dynamic>, String>(
+                              dataSource: _pieData,
+                              xValueMapper: (datum, _) =>
+                                  datum['option'] as String,
+                              yValueMapper: (datum, _) =>
+                                  datum['turnsTaken'] as int,
+                              dataLabelSettings: const DataLabelSettings(
+                                isVisible: true,
+                                labelPosition: ChartDataLabelPosition.outside,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }
 }
-
-

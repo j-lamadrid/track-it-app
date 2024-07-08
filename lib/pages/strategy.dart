@@ -11,8 +11,6 @@ class StrategyPage extends StatefulWidget {
 }
 
 class _StrategyPage extends State<StrategyPage> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

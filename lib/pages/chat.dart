@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:track_it/pages/widgets/constants.dart';
-import 'package:track_it/pages/home.dart';
-
 
 // new message structure :
 // Doc - channelId (userId) -> (to (id), from (id), time, content)
@@ -79,7 +77,6 @@ class _ChatterScreenState extends State<ChatterScreen> {
     }
   }
 
-
   Future<void> _showErrorDialog() async {
     return showDialog<void>(
       context: context,
@@ -87,7 +84,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Service Unavailable'),
-          content: const Text('You are not yet connected with a provider in our system. '
+          content: const Text(
+              'You are not yet connected with a provider in our system. '
               'Please contact us at ___@___.'),
           actions: <Widget>[
             TextButton(
@@ -138,7 +136,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
             children: <Widget>[
               const ChatStream(),
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 decoration: kMessageContainerDecoration,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -149,7 +148,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
                         color: Colors.white,
                         elevation: 5,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 8.0, top: 2, bottom: 2),
+                          padding: const EdgeInsets.only(
+                              left: 8.0, top: 2, bottom: 2),
                           child: TextField(
                             onChanged: (value) {
                               messageText = value;
@@ -198,7 +198,8 @@ class ChatStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('messages').orderBy('timestamp').snapshots(),
+      stream:
+          _firestore.collection('messages').orderBy('timestamp').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final messages = snapshot.data!.docs.reversed;
@@ -209,7 +210,7 @@ class ChatStream extends StatelessWidget {
             final msgReceiverId = message['receiver'];
             MessageBubble msgBubble;
 
-            if (msgSenderId == userId || msgReceiverId == userId){
+            if (msgSenderId == userId || msgReceiverId == userId) {
               if (msgSenderId == userId) {
                 msgBubble = MessageBubble(
                   msgText: msgText,
@@ -249,14 +250,20 @@ class MessageBubble extends StatelessWidget {
   final String msgText;
   final String msgSender;
   final bool user;
-  const MessageBubble({super.key, required this.msgText, required this.msgSender, required this.user});
+
+  const MessageBubble(
+      {super.key,
+      required this.msgText,
+      required this.msgSender,
+      required this.user});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
-        crossAxisAlignment: user ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            user ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -269,9 +276,11 @@ class MessageBubble extends StatelessWidget {
           Material(
             borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(50),
-              topLeft: user ? const Radius.circular(50) : const Radius.circular(0),
+              topLeft:
+                  user ? const Radius.circular(50) : const Radius.circular(0),
               bottomRight: const Radius.circular(50),
-              topRight: user ? const Radius.circular(0) : const Radius.circular(50),
+              topRight:
+                  user ? const Radius.circular(0) : const Radius.circular(50),
             ),
             color: user ? Colors.white : Colors.grey[300],
             elevation: 5,

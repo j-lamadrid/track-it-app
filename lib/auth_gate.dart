@@ -20,10 +20,8 @@ class AuthGate extends StatelessWidget {
         }
 
         if (LoginScreen.loggedIn == true) {
-
           return const MyHomePage(title: 'Home');
         } else {
-
           return const LoginScreen();
         }
       },
