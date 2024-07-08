@@ -14,7 +14,8 @@ import 'package:track_it/pages/home.dart';
 // psychId -> [uid, uid, uid]
 // messages -> uid -> (senderId, receiverId, time, content)
 // for users: query messages for curr userId
-// for providers: page with all connected users, select then query that users id
+// for providers: page with all connected users,
+// select then query that users id
 
 final _firestore = FirebaseFirestore.instance;
 final _user = FirebaseAuth.instance.currentUser!;

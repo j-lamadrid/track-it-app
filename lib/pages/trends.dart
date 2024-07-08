@@ -18,7 +18,7 @@ class _TrendsPageState extends State<TrendsPage> {
   List<Map<String, dynamic>> _data = [];
   List<Map<String, dynamic>> _pieData = [];
   bool _loading = true;
-
+  String _selectedRange = 'Past 7 Days';
 
   @override
   void initState() {
@@ -57,6 +57,7 @@ class _TrendsPageState extends State<TrendsPage> {
 
   List<Map<String, dynamic>> _processData(Map<String, dynamic> data) {
     List<Map<String, dynamic>> result = [];
+    Map<String, Map<String, int>> monthlyData = {};
 
     data.forEach((date, activities) {
       int turnsTaken = 0;
@@ -71,29 +72,49 @@ class _TrendsPageState extends State<TrendsPage> {
         }
       });
 
-      result.add({
-        'date': date,
-        'turnsTaken': turnsTaken,
-        'timeSpent': timeSpent,
-      });
+      if (_selectedRange == 'Past Year') {
+        String month = date.substring(0, 7); // Get YYYY-MM from date
+        if (!monthlyData.containsKey(month)) {
+          monthlyData[month] = {'turnsTaken': 0, 'timeSpent': 0};
+        }
+        monthlyData[month]!['turnsTaken'] = monthlyData[month]!['turnsTaken']! + turnsTaken;
+        monthlyData[month]!['timeSpent'] = monthlyData[month]!['timeSpent']! + timeSpent;
+      } else {
+        result.add({
+          'date': date,
+          'turnsTaken': turnsTaken,
+          'timeSpent': timeSpent,
+        });
+      }
     });
+
+    if (_selectedRange == 'Past Year') {
+      monthlyData.forEach((month, values) {
+        result.add({
+          'date': month,
+          'turnsTaken': values['turnsTaken']!,
+          'timeSpent': values['timeSpent']!,
+        });
+      });
+    }
+
     result.sort((a, b) => a['date'].compareTo(b['date']));
-    int start = result.length - 7;
+    int start;
+    if (_selectedRange == 'Past 7 Days') {
+      start = result.length - 7;
+    } else if (_selectedRange == 'Past 30 Days') {
+      start = result.length - 30;
+    } else if (_selectedRange == 'Past Year') {
+      start = result.length - 12;
+    } else {
+      start = 0;
+    }
+
     if (start < 0) {
       start = 0;
     }
+
     result = result.sublist(start, result.length);
-    return result;
-  }
-
-  List<num> _aggregateData() {
-    List<num> result = [0, 0];
-
-    for (var i = 0; i < _data.length; i++) {
-      result[0] += _data[i]['turnsTaken'] / _data.length;
-      result[1] += _data[i]['timeSpent'] / _data.length;
-    }
-
     return result;
   }
 
@@ -117,26 +138,26 @@ class _TrendsPageState extends State<TrendsPage> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       String userId = user.uid;
-      CollectionReference ref = FirebaseFirestore.instance.collection(
-          'times_of_day');
-      DocumentSnapshot<Map<String, dynamic>> userRef = await ref.doc(userId)
-          .get() as DocumentSnapshot<Map<String, dynamic>>;
+      CollectionReference ref = FirebaseFirestore.instance.collection('times_of_day');
+      DocumentSnapshot<Map<String, dynamic>> userRef = await ref.doc(userId).get() as DocumentSnapshot<Map<String, dynamic>>;
       data = userRef.data() as Map<String, dynamic>;
     }
 
-    data.forEach((date, activities) {
-      (activities as Map).forEach((activityKey, activityValue) {
+    List<Map<String, dynamic>> filteredData = _filterDataByDateRange(data);
+
+    for (var entry in filteredData) {
+      (entry['activities'] as Map).forEach((activityKey, activityValue) {
         if (activityValue["TurnsTaken"] != null) {
           result[options.indexOf(activityKey)] += activityValue["TurnsTaken"] as int;
         }
       });
-    });
+    }
 
     for (var i = 0; i < options.length; i++) {
       if (result[i] > 0) {
         output.add({
-        'option': options[i],
-        'turnsTaken': result[i]
+          'option': options[i],
+          'turnsTaken': result[i]
         });
       }
     }
@@ -145,6 +166,35 @@ class _TrendsPageState extends State<TrendsPage> {
       _pieData = output;
       _loading = false;
     });
+  }
+
+  List<Map<String, dynamic>> _filterDataByDateRange(Map<String, dynamic> data) {
+    List<Map<String, dynamic>> result = [];
+
+    data.forEach((date, activities) {
+      result.add({
+        'date': date,
+        'activities': activities,
+      });
+    });
+
+    result.sort((a, b) => a['date'].compareTo(b['date']));
+    int start;
+    if (_selectedRange == 'Past 7 Days') {
+      start = result.length - 7;
+    } else if (_selectedRange == 'Past 30 Days') {
+      start = result.length - 30;
+    } else if (_selectedRange == 'Past Year') {
+      start = result.length - 365;
+    } else {
+      start = 0;
+    }
+
+    if (start < 0) {
+      start = 0;
+    }
+
+    return result.sublist(start, result.length);
   }
 
   @override
@@ -185,6 +235,24 @@ class _TrendsPageState extends State<TrendsPage> {
             ),
             child: Column(
               children: [
+                DropdownButton<String>(
+                  value: _selectedRange,
+                  items: <String>['Past 7 Days', 'Past 30 Days', 'Past Year'].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      setState(() {
+                        _selectedRange = newValue!;
+                        _loading = false;
+                      });
+                      _fetchAndProcessData().then((_) => _loadPieData());
+                    });
+                  },
+                ),
                 SizedBox(
                   height: 500,
                   child: SfCartesianChart(
@@ -205,7 +273,7 @@ class _TrendsPageState extends State<TrendsPage> {
                         xValueMapper: (datum, _) => datum['date'] as String,
                         yValueMapper: (datum, _) => datum['turnsTaken'] as num,
                         name: 'Turns Taken',
-                        dataLabelSettings: const DataLabelSettings(isVisible: true),
+                        dataLabelSettings: const DataLabelSettings(isVisible: false),
                       ),
                       LineSeries<Map<String, dynamic>, String>(
                         dataSource: _data,
@@ -213,7 +281,7 @@ class _TrendsPageState extends State<TrendsPage> {
                         xValueMapper: (datum, _) => datum['date'] as String,
                         yValueMapper: (datum, _) => dp((datum['timeSpent'] / 60), 2),
                         name: 'Time Spent (hours)',
-                        dataLabelSettings: const DataLabelSettings(isVisible: true),
+                        dataLabelSettings: const DataLabelSettings(isVisible: false),
                       ),
                     ],
                   ),
@@ -243,8 +311,8 @@ class _TrendsPageState extends State<TrendsPage> {
                         xValueMapper: (datum, _) => datum['option'] as String,
                         yValueMapper: (datum, _) => datum['turnsTaken'] as int,
                         dataLabelSettings: const DataLabelSettings(
-                            isVisible: true,
-                            labelPosition: ChartDataLabelPosition.outside,
+                          isVisible: true,
+                          labelPosition: ChartDataLabelPosition.outside,
                         ),
                       ),
                     ],
@@ -258,3 +326,5 @@ class _TrendsPageState extends State<TrendsPage> {
     );
   }
 }
+
+
