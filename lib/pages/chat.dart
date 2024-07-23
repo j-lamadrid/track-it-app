@@ -86,7 +86,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
           title: const Text('Service Unavailable'),
           content: const Text(
               'You are not yet connected with a provider in our system. '
-              'Please contact us at ___@___.'),
+                  'Please contact us at ___@___.'),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
@@ -137,7 +137,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
               const ChatStream(),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 decoration: kMessageContainerDecoration,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -199,7 +199,7 @@ class ChatStream extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream:
-          _firestore.collection('messages').orderBy('timestamp').snapshots(),
+      _firestore.collection('messages').orderBy('timestamp').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final messages = snapshot.data!.docs.reversed;
@@ -253,9 +253,9 @@ class MessageBubble extends StatelessWidget {
 
   const MessageBubble(
       {super.key,
-      required this.msgText,
-      required this.msgSender,
-      required this.user});
+        required this.msgText,
+        required this.msgSender,
+        required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +263,7 @@ class MessageBubble extends StatelessWidget {
       padding: const EdgeInsets.all(12.0),
       child: Column(
         crossAxisAlignment:
-            user ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        user ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -277,10 +277,10 @@ class MessageBubble extends StatelessWidget {
             borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(50),
               topLeft:
-                  user ? const Radius.circular(50) : const Radius.circular(0),
+              user ? const Radius.circular(50) : const Radius.circular(0),
               bottomRight: const Radius.circular(50),
               topRight:
-                  user ? const Radius.circular(0) : const Radius.circular(50),
+              user ? const Radius.circular(0) : const Radius.circular(50),
             ),
             color: user ? Colors.white : Colors.grey[300],
             elevation: 5,

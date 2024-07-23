@@ -28,8 +28,9 @@ class _LoginScreen extends State<LoginScreen> {
         if (credential.user?.emailVerified == false) {
           await credential.user?.sendEmailVerification();
           return 'Please verify your email';
+        } else {
+          LoginScreen.loggedIn = true;
         }
-        LoginScreen.loggedIn = true;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           print('No user found');
@@ -112,8 +113,8 @@ class _LoginScreen extends State<LoginScreen> {
       loginAfterSignUp: false,
       userValidator: (value) {
         if ((!value!.contains('@')) ||
-            (!value.endsWith('.com') && !value.endsWith('.edu'))) {
-          return "Email must contain '@' and end with '.com' or '.edu'";
+            (!value.endsWith('.com') && !value.endsWith('.edu') && !value.endsWith('.gov'))) {
+          return "Invalid Email";
         }
         return null;
       },
