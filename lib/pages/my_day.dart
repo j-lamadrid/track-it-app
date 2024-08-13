@@ -282,11 +282,11 @@ class _MyDayPage extends State<MyDayPage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(4.0),
+                                padding: const EdgeInsets.all(6.0),
                                 child: Text(_options[index]),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(4.0),
+                                padding: const EdgeInsets.all(6.0),
                                 child: _checked[index]
                                     ? TextField(
                                         controller: _timeControllers[index],
@@ -307,6 +307,10 @@ class _MyDayPage extends State<MyDayPage> {
                                               vertical: 4.0, horizontal: 4.0),
                                           fillColor: Colors.white10,
                                           hoverColor: Colors.black12,
+                                          constraints: BoxConstraints(
+                                            maxHeight: 30.0,
+                                            maxWidth: 60.0,
+                                          )
                                         ),
                                         keyboardType: TextInputType.number,
                                         onChanged: (value) {
@@ -319,7 +323,7 @@ class _MyDayPage extends State<MyDayPage> {
                                     : Container(),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(4.0),
+                                padding: const EdgeInsets.all(6.0),
                                 child: _checked[index]
                                     ? TextField(
                                         controller: _turnsControllers[index],
@@ -340,6 +344,10 @@ class _MyDayPage extends State<MyDayPage> {
                                               vertical: 4.0, horizontal: 4.0),
                                           fillColor: Colors.white10,
                                           hoverColor: Colors.black12,
+                                            constraints: BoxConstraints(
+                                              maxHeight: 30.0,
+                                              maxWidth: 60.0,
+                                            )
                                         ),
                                         keyboardType: TextInputType.number,
                                         onChanged: (value) {
