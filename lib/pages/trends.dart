@@ -227,10 +227,16 @@ class _TrendsPageState extends State<TrendsPage> {
           ),
         ),
       ),
-      body: Center(
-        child: _loading
-            ? const CircularProgressIndicator()
-            : SingleChildScrollView(
+      body: SizedBox.expand(
+        child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+          colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          ),
+        ),
+        child: SingleChildScrollView(
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -266,6 +272,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       SizedBox(
                         height: 500,
                         child: SfCartesianChart(
+                          backgroundColor: Colors.transparent,
                           legend: const Legend(isVisible: true),
                           enableAxisAnimation: true,
                           plotAreaBackgroundColor: Colors.transparent,
@@ -307,6 +314,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       SizedBox(
                         height: 350,
                         child: SfCircularChart(
+                          backgroundColor: Colors.transparent,
                           title: const ChartTitle(
                               text: '# of Turns Taken By Time of Day'),
                           legend: const Legend(isVisible: true),
@@ -342,6 +350,7 @@ class _TrendsPageState extends State<TrendsPage> {
                   ),
                 ),
               ),
+        ),
       ),
     );
   }

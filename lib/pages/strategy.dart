@@ -121,7 +121,7 @@ class _StrategyPage extends State<StrategyPage> {
               // Strategy 4
               _buildStrategySection(
                 context,
-                title: 'Strategies to Enhance Therapy Best Practices',
+                title: 'Strategies to Enhance Therapy',
                 icon: Icons.handshake_rounded,
                 children: [
                   _buildSubStrategy("It's a family affair", ''),
@@ -145,21 +145,25 @@ class _StrategyPage extends State<StrategyPage> {
       }
       ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.all(16.0),
+          height: 120.0,
+          width: 120.0,
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-            color: color
+            color: color,
+            borderRadius: BorderRadius.circular(20)
           ),
-          child: Row(
+          child: Column(
             children: [
-              Icon(icon, color: Colors.black54),
-              const SizedBox(width: 8.0),
+              Icon(icon, color: Colors.black54, size: 28.0,),
+              const SizedBox(height: 4.0,),
               Text(
                 title,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
@@ -167,6 +171,7 @@ class _StrategyPage extends State<StrategyPage> {
             ],
           ),
         ),
+        const SizedBox(height: 16.0,),
         ...children,
       ],
     );

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:track_it/pages/home.dart';
+import 'package:flutter_login/flutter_login.dart';
+import 'package:track_it/auth_gate.dart';
 import 'package:track_it/pages/strategy.dart';
 import 'package:track_it/pages/transition_route_observer.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'auth_gate.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         navigatorObservers: [TransitionRouteObserver()],
-        home: const StrategyPage(title: 'strats'),
+        home: const AuthGate(),
         );
   }
 }

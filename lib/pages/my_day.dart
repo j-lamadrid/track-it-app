@@ -160,9 +160,7 @@ class _MyDayPage extends State<MyDayPage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.blueAccent[100]!, Colors.blueAccent[100]!],
-              // Adjust color shades as desired
               begin: Alignment.topLeft,
-              // Change for different gradient directions
               end: Alignment.bottomRight,
             ),
           ),
@@ -173,9 +171,7 @@ class _MyDayPage extends State<MyDayPage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
-              // Adjust color shades as desired
               begin: Alignment.topLeft,
-              // Change for different gradient directions
               end: Alignment.bottomRight,
             ),
           ),
@@ -283,7 +279,7 @@ class _MyDayPage extends State<MyDayPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: Text(_options[index]),
+                                child: Text(_options[index],),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(6.0),
