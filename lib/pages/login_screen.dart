@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
+import 'package:flutter/scheduler.dart' show SchedulerBinding, timeDilation;
 import 'package:flutter_login/flutter_login.dart';
 import 'package:track_it/pages/custom_route.dart';
 import 'package:track_it/pages/home.dart';
@@ -16,6 +16,27 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> {
   Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfLoggedIn();
+  }
+
+  Future<void> _checkIfLoggedIn() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Use SchedulerBinding to ensure the navigation happens after the current frame
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const MyHomePage(title: "Home Page"),
+          ),
+        );
+      });
+    }
+  }
+
 
   Future<String?> _loginUser(LoginData data) {
     return Future.delayed(loginTime).then((_) async {
@@ -189,7 +210,6 @@ class IntroWidget extends StatelessWidget {
       children: [
         Row(
           children: <Widget>[
-            Expanded(child: Divider()),
             Padding(
               padding: EdgeInsets.all(8.0),
             ),

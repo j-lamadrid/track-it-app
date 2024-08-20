@@ -281,7 +281,6 @@ class _MyDayPage extends State<MyDayPage> {
                                 padding: const EdgeInsets.all(6.0),
                                 child: Text(
                                   _options[index],
-                                  textAlign: TextAlign.start,
                                   textHeightBehavior: const TextHeightBehavior(
                                     leadingDistribution: TextLeadingDistribution.even
                                   ),

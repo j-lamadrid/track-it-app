@@ -160,8 +160,8 @@ class _StrategyPage extends State<StrategyPage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          height: 120.0,
-          width: 120.0,
+          height: 140.0,
+          width: 140.0,
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             color: color,
@@ -174,6 +174,9 @@ class _StrategyPage extends State<StrategyPage> {
               Text(
                 title,
                 textAlign: TextAlign.center,
+                textHeightBehavior: const TextHeightBehavior(
+                  leadingDistribution: TextLeadingDistribution.even
+                ),
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
