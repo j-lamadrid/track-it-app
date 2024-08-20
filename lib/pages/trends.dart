@@ -276,6 +276,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       });
                     },
                   ),
+                  const SizedBox(height: 25),
                   SizedBox(
                     height: 500,
                     child: SfCartesianChart(
@@ -334,7 +335,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 75),
+                  const SizedBox(height: 50),
                   DropdownButton<String>(
                     value: _selectedScale,
                     alignment: AlignmentDirectional.center,
@@ -355,6 +356,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       });
                     },
                   ),
+                  const SizedBox(height: 25),
                   SizedBox(
                     height: 350,
                     child: SfCircularChart(
