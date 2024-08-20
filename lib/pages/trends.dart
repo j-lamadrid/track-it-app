@@ -19,6 +19,7 @@ class _TrendsPageState extends State<TrendsPage> {
   List<Map<String, dynamic>> _pieData = [];
   bool _loading = true;
   String _selectedRange = 'Past 7 Days';
+  String _selectedScale = 'Turns Taken';
 
   @override
   void initState() {
@@ -137,7 +138,8 @@ class _TrendsPageState extends State<TrendsPage> {
       'Story time',
       'Other',
     ];
-    List<num> result = List<int>.filled(options.length, 0, growable: false);
+    List<num> turnResult = List<int>.filled(options.length, 0, growable: false);
+    List<num> timeResult = List<int>.filled(options.length, 0, growable: false);
     List<Map<String, dynamic>> output = [];
     Map<String, dynamic> data = {};
     User? user = FirebaseAuth.instance.currentUser;
@@ -155,16 +157,22 @@ class _TrendsPageState extends State<TrendsPage> {
     for (var entry in filteredData) {
       (entry['activities'] as Map).forEach((activityKey, activityValue) {
         if (activityValue["TurnsTaken"] != null) {
-          result[options.indexOf(activityKey)] +=
+          turnResult[options.indexOf(activityKey)] +=
               activityValue["TurnsTaken"] as int;
+        }
+        if (activityValue["TimeSpent"] != null) {
+          timeResult[options.indexOf(activityKey)] +=
+              activityValue["TimeSpent"] as int;
         }
       });
     }
 
     for (var i = 0; i < options.length; i++) {
-      if (result[i] > 0) {
-        output.add({'option': options[i], 'turnsTaken': result[i]});
-      }
+      output.add({
+        'option': options[i],
+        'turnsTaken': turnResult[i] ?? 0,
+        'timeSpent': timeResult[i] ?? 0
+      });
     }
 
     setState(() {
@@ -229,127 +237,173 @@ class _TrendsPageState extends State<TrendsPage> {
       ),
       body: SizedBox.expand(
         child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-          colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: SingleChildScrollView(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      DropdownButton<String>(
-                        value: _selectedRange,
-                        items: <String>[
-                          'Past 7 Days',
-                          'Past 30 Days',
-                          'Past Year'
-                        ].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            setState(() {
-                              _selectedRange = newValue!;
-                              _loading = false;
-                            });
-                            _fetchAndProcessData().then((_) => _loadPieData());
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        height: 500,
-                        child: SfCartesianChart(
-                          backgroundColor: Colors.transparent,
-                          legend: const Legend(isVisible: true),
-                          enableAxisAnimation: true,
-                          plotAreaBackgroundColor: Colors.transparent,
-                          primaryXAxis: const CategoryAxis(
-                            labelRotation: 45,
-                          ),
-                          primaryYAxis: const NumericAxis(
-                            title: AxisTitle(text: 'Count'),
-                          ),
-                          title:
-                              const ChartTitle(text: 'Trends in Turn Taking'),
-                          series: <LineSeries<Map<String, dynamic>, String>>[
-                            LineSeries<Map<String, dynamic>, String>(
-                              dataSource: _data,
-                              color: Colors.black,
-                              xValueMapper: (datum, _) =>
-                                  datum['date'] as String,
-                              yValueMapper: (datum, _) =>
-                                  datum['turnsTaken'] as num,
-                              name: 'Turns Taken',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: false),
-                            ),
-                            LineSeries<Map<String, dynamic>, String>(
-                              dataSource: _data,
-                              color: Colors.grey,
-                              xValueMapper: (datum, _) =>
-                                  datum['date'] as String,
-                              yValueMapper: (datum, _) =>
-                                  dp((datum['timeSpent'] / 60), 2),
-                              name: 'Time Spent (hours)',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: false),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 75),
-                      SizedBox(
-                        height: 350,
-                        child: SfCircularChart(
-                          backgroundColor: Colors.transparent,
-                          title: const ChartTitle(
-                              text: '# of Turns Taken By Time of Day'),
-                          legend: const Legend(isVisible: true),
-                          palette: <Color>[
-                            Colors.white,
-                            Colors.brown.shade200,
-                            Colors.brown.shade400,
-                            Colors.brown.shade800,
-                            Colors.blue.shade200,
-                            Colors.blue.shade400,
-                            Colors.blue.shade800,
-                            Colors.grey.shade300,
-                            Colors.grey.shade500,
-                            Colors.grey.shade800,
-                            Colors.black
-                          ],
-                          series: <PieSeries<Map<String, dynamic>, String>>[
-                            PieSeries<Map<String, dynamic>, String>(
-                              dataSource: _pieData,
-                              xValueMapper: (datum, _) =>
-                                  datum['option'] as String,
-                              yValueMapper: (datum, _) =>
-                                  datum['turnsTaken'] as int,
-                              dataLabelSettings: const DataLabelSettings(
-                                isVisible: true,
-                                labelPosition: ChartDataLabelPosition.outside,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+          child: SingleChildScrollView(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.transparent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
+              child: Column(
+                children: [
+                  DropdownButton<String>(
+                    value: _selectedRange,
+                    dropdownColor: Colors.white70,
+                    alignment: AlignmentDirectional.center,
+                    items: <String>['Past 7 Days', 'Past 30 Days', 'Past Year']
+                        .map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        setState(() {
+                          _selectedRange = newValue!;
+                          _loading = false;
+                        });
+                        _fetchAndProcessData().then((_) => _loadPieData());
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 500,
+                    child: SfCartesianChart(
+                      backgroundColor: Colors.transparent,
+                      legend: const Legend(isVisible: true),
+                      enableAxisAnimation: true,
+                      plotAreaBackgroundColor: Colors.transparent,
+                      tooltipBehavior: TooltipBehavior(
+                          enable: true,
+                          animationDuration: 100,
+                          duration: 2000,
+                          shouldAlwaysShow: false,
+                          activationMode: ActivationMode.singleTap),
+                      primaryXAxis: const CategoryAxis(
+                        labelRotation: 45,
+                      ),
+                      primaryYAxis: const NumericAxis(
+                        title: AxisTitle(text: 'Count'),
+                      ),
+                      title: const ChartTitle(
+                          text: 'Trends in Turn Taking',
+                          textStyle: TextStyle(fontWeight: FontWeight.bold)),
+                      series: <LineSeries<Map<String, dynamic>, String>>[
+                        LineSeries<Map<String, dynamic>, String>(
+                          dataSource: _data,
+                          markerSettings: const MarkerSettings(
+                              isVisible: true,
+                              color: Colors.black,
+                              shape: DataMarkerType.circle,
+                              height: 4.0,
+                              width: 4.0),
+                          color: Colors.black,
+                          xValueMapper: (datum, _) => datum['date'] as String,
+                          yValueMapper: (datum, _) =>
+                              datum['turnsTaken'] as num,
+                          name: 'Turns Taken',
+                          dataLabelSettings:
+                              const DataLabelSettings(isVisible: false),
+                        ),
+                        LineSeries<Map<String, dynamic>, String>(
+                          dataSource: _data,
+                          markerSettings: const MarkerSettings(
+                              isVisible: true,
+                              color: Colors.grey,
+                              shape: DataMarkerType.circle,
+                              height: 4.0,
+                              width: 4.0),
+                          color: Colors.grey,
+                          xValueMapper: (datum, _) => datum['date'] as String,
+                          yValueMapper: (datum, _) =>
+                              dp((datum['timeSpent'] / 60), 2),
+                          name: 'Time Spent (hours)',
+                          dataLabelSettings:
+                              const DataLabelSettings(isVisible: false),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 75),
+                  DropdownButton<String>(
+                    value: _selectedScale,
+                    alignment: AlignmentDirectional.center,
+                    dropdownColor: Colors.white70,
+                    items: <String>['Turns Taken', 'Time Spent (mins)']
+                        .map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        setState(() {
+                          _selectedScale = newValue!;
+                          _loading = false;
+                        });
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 350,
+                    child: SfCircularChart(
+                      backgroundColor: Colors.transparent,
+                      tooltipBehavior: TooltipBehavior(
+                          enable: true,
+                          animationDuration: 100,
+                          duration: 2000,
+                          shouldAlwaysShow: false,
+                          activationMode: ActivationMode.singleTap),
+                      title: const ChartTitle(
+                          text: 'Turn Taking By Time of Day',
+                          textStyle: TextStyle(fontWeight: FontWeight.bold)),
+                      legend: const Legend(
+                        isVisible: true,
+                      ),
+                      palette: <Color>[
+                        Colors.white,
+                        Colors.grey.shade300,
+                        Colors.grey.shade500,
+                        Colors.grey.shade800,
+                        Colors.black,
+                        Colors.yellow.shade200,
+                        Colors.yellow.shade600,
+                        Colors.yellow.shade800,
+                        Colors.blue.shade200,
+                        Colors.blue.shade400,
+                        Colors.blue.shade800,
+                      ],
+                      series: <PieSeries<Map<String, dynamic>, String>>[
+                        PieSeries<Map<String, dynamic>, String>(
+                          dataSource: _pieData,
+                          xValueMapper: (datum, _) => datum['option'] as String,
+                          yValueMapper: (datum, _) =>
+                              _selectedScale == 'Turns Taken'
+                                  ? datum['turnsTaken'] as int
+                                  : datum['timeSpent'] as int,
+                          dataLabelSettings: const DataLabelSettings(
+                            isVisible: true,
+                            labelPosition: ChartDataLabelPosition.outside,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

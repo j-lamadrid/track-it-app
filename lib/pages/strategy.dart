@@ -57,30 +57,41 @@ class _StrategyPage extends State<StrategyPage> {
                   _buildSubStrategy('Use baby talk',
                       'Remember to speak to your child in a playful manner. '
                           'Use exaggerated intonation, simple grammar, '
-                          'high pitch, and slow tempo.'),
+                          'high pitch, and slow tempo.',
+                      ''
+                  ),
                   _buildSubStrategy('Face to face positioning', "Children learn "
                       "by watching their parent's face. When interacting with "
-                      "your child, position yourself in front of your child."),
+                      "your child, position yourself in front of your child.",
+                      ''
+                  ),
                   _buildSubStrategy('Face directing activities', 'During playtime '
                       'engage in face-directing activities such as making faces '
                       'and exaggerating facial expressions, smiling and exaggerating '
-                      'the speech sounds your child is in the process of learning. '
-                      'Also engage in activities such as '
-                      'peek a boo, face painting, blowing bubbles, blowing kisses, '
-                      'brushing hair, and blowing up small balloons.'),
+                      'the speech sounds your child is in the process of learning.',
+                      'Peek a boo\nFace painting\nBlowing bubbles\n'
+                          'Blowing kisses\nBrushing hair\nBlowing up '
+                          'small balloons'
+                  ),
                   _buildSubStrategy('Be silly!', 'Activities do not have to be in '
                       'a set order or sequence! Have fun with your child and take '
-                      'opportunities for tickling and sharing enjoyment.'),
+                      'opportunities for tickling and sharing enjoyment.',
+                      ''
+                  ),
                   _buildSubStrategy('Social routines', 'Many children enjoy '
                       'routines like "pat-a-cake" and "twinkle-twinkle". These '
                       'routines encourage verbal language, social engagement, '
                       'and nonverbal communication like gestures. Make it even '
                       'more fun by embellishing your gestures and expressions '
                       'to make it more salient for your child and encourage '
-                      'social attention.'),
+                      'social attention.',
+                      'Itsy Bitsy Spider\nWheels on the bus\nPat a cake'
+                  ),
                   _buildSubStrategy('Play singing', 'Many children enjoy singing, '
                       'or listening to others sing. Does your child? If so, sing '
-                      'while they are looking at you.'),
+                      'while they are looking at you.',
+                      ''
+                  ),
                 ],
                   color: Colors.orangeAccent[100]
               ),
@@ -92,12 +103,12 @@ class _StrategyPage extends State<StrategyPage> {
                 title: 'Strategies to Enhance Turn-Taking',
                 icon: Icons.loop,
                 children: [
-                  _buildSubStrategy('Use predictable phrases', ''),
-                  _buildSubStrategy('Take short turns and accept short turns from your child', ''),
-                  _buildSubStrategy('Establish turn-taking routines and games', ''),
-                  _buildSubStrategy('Expand', ''),
-                  _buildSubStrategy('Gentle blocking', ''),
-                  _buildSubStrategy('TrackiT!', ''),
+                  _buildSubStrategy('Use predictable phrases', '', ''),
+                  _buildSubStrategy('Take short turns and accept short turns from your child', '', ''),
+                  _buildSubStrategy('Establish turn-taking routines and games', '', ''),
+                  _buildSubStrategy('Expand', '', ''),
+                  _buildSubStrategy('Gentle blocking', '', ''),
+                  _buildSubStrategy('TrackiT!', '', ''),
                 ],
                   color: Colors.green[100]
               ),
@@ -109,10 +120,10 @@ class _StrategyPage extends State<StrategyPage> {
                 title: 'Strategies to Enhance Child Motivation',
                 icon: Icons.lightbulb,
                 children: [
-                  _buildSubStrategy("Follow your child's lead", ''),
-                  _buildSubStrategy('Reinforce all attempts', ''),
-                  _buildSubStrategy('Imitate your child', ''),
-                  _buildSubStrategy('Child choice', ''),
+                  _buildSubStrategy("Follow your child's lead", '', ''),
+                  _buildSubStrategy('Reinforce all attempts', '', ''),
+                  _buildSubStrategy('Imitate your child', '', ''),
+                  _buildSubStrategy('Child choice', '', ''),
                 ],
                   color: Colors.redAccent[100]
               ),
@@ -124,9 +135,10 @@ class _StrategyPage extends State<StrategyPage> {
                 title: 'Strategies to Enhance Therapy',
                 icon: Icons.handshake_rounded,
                 children: [
-                  _buildSubStrategy("It's a family affair", ''),
-                  _buildSubStrategy("Model play that is at your child's level as well as play that is slightly in advance", ''),
-                  _buildSubStrategy('Natural reinforcer', ''),
+                  _buildSubStrategy("It's a family affair", '', ''),
+                  _buildSubStrategy("Model play that is at your child's level as "
+                      "well as play that is slightly in advance", '', ''),
+                  _buildSubStrategy('Natural reinforcer', '', ''),
                 ],
                 color: Colors.deepPurple[100]
               ),
@@ -177,8 +189,10 @@ class _StrategyPage extends State<StrategyPage> {
     );
   }
 
-  Widget _buildSubStrategy(String title, String description) {
+  Widget _buildSubStrategy(String title, String description, String examples) {
     return ExpansionTile(
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: Colors.white24,
       title: Text(
         title,
         style: const TextStyle(
@@ -188,7 +202,7 @@ class _StrategyPage extends State<StrategyPage> {
         ),
       ),
       children: [
-        if (description.isNotEmpty)
+        if (description.isNotEmpty) ...[
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -198,6 +212,26 @@ class _StrategyPage extends State<StrategyPage> {
             ),
           ),
           const SizedBox(height: 8),
+        ],
+        if (examples.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          const Padding(padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Examples:',
+              style: TextStyle(fontSize: 14,
+                  color: Colors.black,
+                fontWeight: FontWeight.bold
+              ),
+            ),),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              examples,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ]
       ],
     );
   }

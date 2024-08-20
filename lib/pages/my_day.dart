@@ -279,7 +279,13 @@ class _MyDayPage extends State<MyDayPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: Text(_options[index],),
+                                child: Text(
+                                  _options[index],
+                                  textAlign: TextAlign.start,
+                                  textHeightBehavior: const TextHeightBehavior(
+                                    leadingDistribution: TextLeadingDistribution.even
+                                  ),
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(6.0),
@@ -287,27 +293,28 @@ class _MyDayPage extends State<MyDayPage> {
                                     ? TextField(
                                         controller: _timeControllers[index],
                                         decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black)),
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black26)),
-                                          disabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black)),
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 4.0),
-                                          fillColor: Colors.white10,
-                                          hoverColor: Colors.black12,
-                                          constraints: BoxConstraints(
-                                            maxHeight: 30.0,
-                                            maxWidth: 60.0,
-                                          )
-                                        ),
+                                            border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black26)),
+                                            disabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 4.0,
+                                                    horizontal: 4.0),
+                                            fillColor: Colors.white10,
+                                            hoverColor: Colors.black12,
+                                            constraints: BoxConstraints(
+                                              maxHeight: 30.0,
+                                              maxWidth: 60.0,
+                                            )),
                                         keyboardType: TextInputType.number,
                                         onChanged: (value) {
                                           _saveState();
@@ -324,27 +331,28 @@ class _MyDayPage extends State<MyDayPage> {
                                     ? TextField(
                                         controller: _turnsControllers[index],
                                         decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black)),
-                                          enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black26)),
-                                          disabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.black)),
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 4.0),
-                                          fillColor: Colors.white10,
-                                          hoverColor: Colors.black12,
+                                            border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black26)),
+                                            disabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    vertical: 4.0,
+                                                    horizontal: 4.0),
+                                            fillColor: Colors.white10,
+                                            hoverColor: Colors.black12,
                                             constraints: BoxConstraints(
                                               maxHeight: 30.0,
                                               maxWidth: 60.0,
-                                            )
-                                        ),
+                                            )),
                                         keyboardType: TextInputType.number,
                                         onChanged: (value) {
                                           _saveState();
