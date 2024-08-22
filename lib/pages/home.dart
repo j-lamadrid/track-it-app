@@ -60,6 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  //Image.asset(
+                  //  'lib/images/health_logo.png',
+                  //  height: 75,
+                  //  width: 250,
+                  //),
                   const Text(
                     'Welcome Parent!',
                     style: TextStyle(
