@@ -76,7 +76,7 @@ class _TrendsPageState extends State<TrendsPage> {
         }
       });
 
-      if (_selectedRange == 'Past Year') {
+      if (_selectedRange == 'All Time') {
         String month = date.substring(0, 7);
         if (!monthlyData.containsKey(month)) {
           monthlyData[month] = {'turnsTaken': 0, 'timeSpent': 0};
@@ -94,7 +94,7 @@ class _TrendsPageState extends State<TrendsPage> {
       }
     });
 
-    if (_selectedRange == 'Past Year') {
+    if (_selectedRange == 'All Time') {
       monthlyData.forEach((month, values) {
         result.add({
           'date': month,
@@ -110,8 +110,8 @@ class _TrendsPageState extends State<TrendsPage> {
       start = result.length - 7;
     } else if (_selectedRange == 'Past 30 Days') {
       start = result.length - 30;
-    } else if (_selectedRange == 'Past Year') {
-      start = result.length - 12;
+    } else if (_selectedRange == 'All Time') {
+      start = 0;
     } else {
       start = 0;
     }
@@ -197,8 +197,8 @@ class _TrendsPageState extends State<TrendsPage> {
       start = result.length - 7;
     } else if (_selectedRange == 'Past 30 Days') {
       start = result.length - 30;
-    } else if (_selectedRange == 'Past Year') {
-      start = result.length - 365;
+    } else if (_selectedRange == 'All Time') {
+      start = 0;
     } else {
       start = 0;
     }
@@ -259,7 +259,7 @@ class _TrendsPageState extends State<TrendsPage> {
                     value: _selectedRange,
                     dropdownColor: Colors.white70,
                     alignment: AlignmentDirectional.center,
-                    items: <String>['Past 7 Days', 'Past 30 Days', 'Past Year']
+                    items: <String>['Past 7 Days', 'Past 30 Days', 'All Time']
                         .map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -281,7 +281,10 @@ class _TrendsPageState extends State<TrendsPage> {
                     height: 500,
                     child: SfCartesianChart(
                       backgroundColor: Colors.transparent,
-                      legend: const Legend(isVisible: true),
+                      legend: const Legend(
+                          isVisible: true,
+                          position: LegendPosition.top
+                      ),
                       enableAxisAnimation: true,
                       plotAreaBackgroundColor: Colors.transparent,
                       tooltipBehavior: TooltipBehavior(
@@ -291,10 +294,15 @@ class _TrendsPageState extends State<TrendsPage> {
                           shouldAlwaysShow: false,
                           activationMode: ActivationMode.singleTap),
                       primaryXAxis: const CategoryAxis(
+                        //title: AxisTitle(text: 'Date'),
                         labelRotation: 45,
+                          autoScrollingMode: AutoScrollingMode.end,
+                        labelIntersectAction: AxisLabelIntersectAction.rotate45,
                       ),
                       primaryYAxis: const NumericAxis(
-                        title: AxisTitle(text: 'Count'),
+                        //title: AxisTitle(text: 'Count'),
+                          autoScrollingMode: AutoScrollingMode.end,
+                        labelIntersectAction: AxisLabelIntersectAction.rotate45,
                       ),
                       title: const ChartTitle(
                           text: 'Trends in Turn Taking',
@@ -372,6 +380,7 @@ class _TrendsPageState extends State<TrendsPage> {
                           textStyle: TextStyle(fontWeight: FontWeight.bold)),
                       legend: const Legend(
                         isVisible: true,
+                        position: LegendPosition.top
                       ),
                       palette: <Color>[
                         Colors.white,

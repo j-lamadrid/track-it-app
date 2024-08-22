@@ -201,6 +201,7 @@ class _MyDayPage extends State<MyDayPage> {
                         2: FlexColumnWidth(4),
                         3: FlexColumnWidth(4),
                       },
+                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                       border: TableBorder.all(
                         color: Colors.white10,
                         width: 1,
@@ -264,7 +265,8 @@ class _MyDayPage extends State<MyDayPage> {
                         for (int index = 0; index < _options.length; index++)
                           TableRow(
                             children: [
-                              Center(
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
                                 child: Checkbox(
                                   value: _checked[index],
                                   onChanged: (bool? value) {
@@ -278,16 +280,13 @@ class _MyDayPage extends State<MyDayPage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(6.0),
+                                padding: const EdgeInsets.all(2.0),
                                 child: Text(
                                   _options[index],
-                                  textHeightBehavior: const TextHeightBehavior(
-                                    leadingDistribution: TextLeadingDistribution.even
-                                  ),
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(6.0),
+                                padding: const EdgeInsets.all(2.0),
                                 child: _checked[index]
                                     ? TextField(
                                         controller: _timeControllers[index],
@@ -325,7 +324,7 @@ class _MyDayPage extends State<MyDayPage> {
                                     : Container(),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(6.0),
+                                padding: const EdgeInsets.all(2.0),
                                 child: _checked[index]
                                     ? TextField(
                                         controller: _turnsControllers[index],
