@@ -266,7 +266,7 @@ class _MyDayPage extends State<MyDayPage> {
                           TableRow(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(1.0),
                                 child: Checkbox(
                                   value: _checked[index],
                                   onChanged: (bool? value) {
@@ -280,7 +280,7 @@ class _MyDayPage extends State<MyDayPage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(2.0),
+                                padding: const EdgeInsets.all(6.0),
                                 child: Text(
                                   _options[index],
                                 ),

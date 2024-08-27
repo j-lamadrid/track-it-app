@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:track_it/pages/chat.dart';
+import 'package:track_it/pages/contacts.dart';
 import 'package:track_it/pages/goals.dart';
 import 'package:track_it/pages/manual.dart';
 import 'package:track_it/pages/my_day.dart';
@@ -18,6 +20,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    userId = _auth.currentUser!.uid;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,8 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => const MyDayPage(
-                                        title: 'My Day',
-                                      )),
+                                            title: 'My Day',
+                                          )),
                                 );
                               },
                               iconSize: 60.0,
@@ -132,8 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => const TrendsPage(
-                                        title: 'Trends Over Time',
-                                      )),
+                                            title: 'Trends Over Time',
+                                          )),
                                 );
                               },
                               iconSize: 60.0,
@@ -174,8 +185,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => const StrategyPage(
-                                        title: 'ASE Strategies',
-                                      )),
+                                            title: 'ASE Strategies',
+                                          )),
                                 );
                               },
                               iconSize: 60.0,
@@ -285,7 +296,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const ChatterScreen()),
+                                      builder: (context) => ContactListScreen(
+                                          userId: userId)),
                                 );
                               },
                               iconSize: 60.0,
@@ -313,4 +325,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
