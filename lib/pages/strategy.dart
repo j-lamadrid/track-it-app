@@ -124,26 +124,36 @@ class _StrategyPage extends State<StrategyPage> {
                             "twice the length of your child's turn.",
                         ''),
                     _buildSubStrategy(
-                        'Establish turn-taking routines and games', "Watch what "
-                        "activities your child likes to do and make a game out of "
-                        "it.",
+                        'Establish turn-taking routines and games',
+                        "Watch what "
+                            "activities your child likes to do and make a game out of "
+                            "it.",
                         'Pushing a ball back and forth\nStacking thick Lego blocks\n'
                             'Dropping objects into a cup'),
-                    _buildSubStrategy('Expand', "Use initial routines as a foundation "
-                        "and expand activites by adding on new routines. This will "
-                        "increase your child's length of social attention, social "
-                        "interest, and communication behaviors.", ''),
-                    _buildSubStrategy('Gentle blocking', "Playfully block access "
-                        "to a toy by holding it out of reach or covering it with "
-                        "your hand to increase your child's eye contact and shared "
-                        'enjoyment. Make it fun by using a funny noise, like "ah!" '
-                        'or "ope!" during blocking. Try to wait until your child '
-                        'uses eye contact with or without a word or word attempt '
-                        'to take her turn.', ''),
-                    _buildSubStrategy('TrackiT!', "Look at your app daily in the "
-                        "'Trends' section to know how often you are successfully "
-                        "taking turns with your child and try to increase your turn "
-                        "taking number by at least 2.", ''),
+                    _buildSubStrategy(
+                        'Expand',
+                        "Use initial routines as a foundation "
+                            "and expand activites by adding on new routines. This will "
+                            "increase your child's length of social attention, social "
+                            "interest, and communication behaviors.",
+                        ''),
+                    _buildSubStrategy(
+                        'Gentle blocking',
+                        "Playfully block access "
+                            "to a toy by holding it out of reach or covering it with "
+                            "your hand to increase your child's eye contact and shared "
+                            'enjoyment. Make it fun by using a funny noise, like "ah!" '
+                            'or "ope!" during blocking. Try to wait until your child '
+                            'uses eye contact with or without a word or word attempt '
+                            'to take her turn.',
+                        ''),
+                    _buildSubStrategy(
+                        'TrackiT!',
+                        "Look at your app daily in the "
+                            "'Trends' section to know how often you are successfully "
+                            "taking turns with your child and try to increase your turn "
+                            "taking number by at least 2.",
+                        ''),
                   ],
                   color: Colors.green[100]),
               const SizedBox(height: 16.0),
@@ -153,9 +163,26 @@ class _StrategyPage extends State<StrategyPage> {
                   title: 'Strategies to Enhance Child Motivation',
                   icon: Icons.lightbulb,
                   children: [
-                    _buildSubStrategy("Follow your child's lead", '', ''),
-                    _buildSubStrategy('Reinforce all attempts', '', ''),
-                    _buildSubStrategy('Imitate your child', '', ''),
+                    _buildSubStrategy(
+                        "Follow your child's lead",
+                        'Children will '
+                            'be more motivated to interact if they are engaging in '
+                            'activities that they are interested in.',
+                        ''),
+                    _buildSubStrategy(
+                        'Reinforce all attempts',
+                        'A primary goal '
+                            'is to encourage your child and keep them motivated and '
+                            'engaged; so it is important to reinforce any attempt at '
+                            'social engagement, talk, play, or responding to a prompt '
+                            'or instruction.',
+                        ''),
+                    _buildSubStrategy(
+                        'Imitate your child',
+                        'Many children enjoy '
+                            'being copied, and imitating your child sends the message '
+                            'that their actions, sounds, and words have meaning to others.',
+                        ''),
                     _buildSubStrategy('Child choice', '', ''),
                   ],
                   color: Colors.redAccent[100]),

@@ -20,6 +20,11 @@ class _TrendsPageState extends State<TrendsPage> {
   bool _loading = true;
   String _selectedRange = 'Past 7 Days';
   String _selectedScale = 'Turns Taken';
+  int _turnsLastWeek = 0;
+  int _turnsWeekBeforeLast = 0;
+  bool _isTurnTrendUp = false;
+  bool _loadingTurnTrend = true;
+  String _percentChange = '';
 
   @override
   void initState() {
@@ -44,10 +49,50 @@ class _TrendsPageState extends State<TrendsPage> {
             .doc(userId)
             .get() as DocumentSnapshot<Map<String, dynamic>>;
         Map<String, dynamic> data = userRef.data() as Map<String, dynamic>;
-        List<Map<String, dynamic>> processedData = _processData(data);
+        List<List<Map<String, dynamic>>> allProcessedData = _processData(data);
+        List<Map<String, dynamic>> processedData = allProcessedData[0];
+        List<Map<String, dynamic>> allData = allProcessedData[1];
+
+        int turnsLastWeek = 0;
+        int turnsWeekBeforeLast = 0;
+
+        DateTime now = DateTime.now();
+        DateTime oneWeekAgo = now.subtract(const Duration(days: 7));
+        DateTime twoWeeksAgo = now.subtract(const Duration(days: 14));
+
+        for (var entry in allData) {
+          DateTime entryDate = DateTime.parse(entry['date']);
+          if (entryDate.isAfter(oneWeekAgo)) {
+            turnsLastWeek += entry['turnsTaken'] as int;
+          } else if (entryDate.isAfter(twoWeeksAgo) &&
+              entryDate.isBefore(oneWeekAgo)) {
+            turnsWeekBeforeLast += entry['turnsTaken'] as int;
+          }
+        }
+
+        // Determine the trend direction
+        bool isTurnTrendUp = turnsLastWeek > turnsWeekBeforeLast;
 
         setState(() {
           _data = processedData;
+          _turnsLastWeek = turnsLastWeek;
+          _turnsWeekBeforeLast = turnsWeekBeforeLast;
+          _isTurnTrendUp = isTurnTrendUp;
+          _loadingTurnTrend = false;
+          if (_turnsWeekBeforeLast != 0) {
+            if (_isTurnTrendUp) {
+              _percentChange =
+                  (((turnsLastWeek / turnsWeekBeforeLast) - 1) * 100)
+                      .toStringAsFixed(0);
+            } else {
+              _percentChange = (((turnsWeekBeforeLast - turnsLastWeek) /
+                          turnsWeekBeforeLast) *
+                      100)
+                  .toStringAsFixed(0);
+            }
+          } else {
+            _percentChange = '';
+          }
         });
       } else {
         setState(() {
@@ -59,8 +104,9 @@ class _TrendsPageState extends State<TrendsPage> {
     }
   }
 
-  List<Map<String, dynamic>> _processData(Map<String, dynamic> data) {
+  List<List<Map<String, dynamic>>> _processData(Map<String, dynamic> data) {
     List<Map<String, dynamic>> result = [];
+    List<Map<String, dynamic>> allData = [];
     Map<String, Map<String, int>> monthlyData = {};
 
     data.forEach((date, activities) {
@@ -92,6 +138,12 @@ class _TrendsPageState extends State<TrendsPage> {
           'timeSpent': timeSpent,
         });
       }
+
+      allData.add({
+        'date': date,
+        'turnsTaken': turnsTaken,
+        'timeSpent': timeSpent,
+      });
     });
 
     if (_selectedRange == 'All Time') {
@@ -121,7 +173,7 @@ class _TrendsPageState extends State<TrendsPage> {
     }
 
     result = result.sublist(start, result.length);
-    return result;
+    return [result, allData];
   }
 
   Future<void> _loadPieData() async {
@@ -255,6 +307,34 @@ class _TrendsPageState extends State<TrendsPage> {
               ),
               child: Column(
                 children: [
+                  if (_percentChange.isNotEmpty) ...[
+                  const SizedBox(height: 25),
+                  if (!_loadingTurnTrend)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _isTurnTrendUp
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          size: 32,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          _isTurnTrendUp
+                              ? 'Great! Up $_percentChange% from last week!'
+                              : 'Down $_percentChange% from last week',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 15),
                   DropdownButton<String>(
                     value: _selectedRange,
                     dropdownColor: Colors.white70,
@@ -276,15 +356,12 @@ class _TrendsPageState extends State<TrendsPage> {
                       });
                     },
                   ),
-                  const SizedBox(height: 25),
                   SizedBox(
                     height: 500,
                     child: SfCartesianChart(
                       backgroundColor: Colors.transparent,
                       legend: const Legend(
-                          isVisible: true,
-                          position: LegendPosition.top
-                      ),
+                          isVisible: true, position: LegendPosition.top),
                       enableAxisAnimation: true,
                       plotAreaBackgroundColor: Colors.transparent,
                       tooltipBehavior: TooltipBehavior(
@@ -296,12 +373,12 @@ class _TrendsPageState extends State<TrendsPage> {
                       primaryXAxis: const CategoryAxis(
                         //title: AxisTitle(text: 'Date'),
                         labelRotation: 45,
-                          autoScrollingMode: AutoScrollingMode.end,
+                        autoScrollingMode: AutoScrollingMode.end,
                         labelIntersectAction: AxisLabelIntersectAction.rotate45,
                       ),
                       primaryYAxis: const NumericAxis(
                         //title: AxisTitle(text: 'Count'),
-                          autoScrollingMode: AutoScrollingMode.end,
+                        autoScrollingMode: AutoScrollingMode.end,
                         labelIntersectAction: AxisLabelIntersectAction.rotate45,
                       ),
                       title: const ChartTitle(
@@ -379,8 +456,12 @@ class _TrendsPageState extends State<TrendsPage> {
                           text: 'Turn Taking By Time of Day',
                           textStyle: TextStyle(fontWeight: FontWeight.bold)),
                       legend: const Legend(
-                        isVisible: true,
-                        position: LegendPosition.top
+                          isVisible: true,
+                          position: LegendPosition.top,
+                          alignment: ChartAlignment.center,
+                          orientation: LegendItemOrientation.auto,
+                          overflowMode: LegendItemOverflowMode.wrap,
+                          padding: 12,
                       ),
                       palette: <Color>[
                         Colors.white,
