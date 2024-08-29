@@ -308,31 +308,31 @@ class _TrendsPageState extends State<TrendsPage> {
               child: Column(
                 children: [
                   if (_percentChange.isNotEmpty) ...[
-                  const SizedBox(height: 25),
-                  if (!_loadingTurnTrend)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _isTurnTrendUp
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                          size: 32,
-                          color: Colors.black,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          _isTurnTrendUp
-                              ? 'Great! Up $_percentChange% from last week!'
-                              : 'Down $_percentChange% from last week',
-                          style: const TextStyle(
+                    const SizedBox(height: 25),
+                    if (!_loadingTurnTrend)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _isTurnTrendUp
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            size: 32,
                             color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 2),
+                          Text(
+                            _isTurnTrendUp
+                                ? 'Great! Up $_percentChange% from last week!'
+                                : 'Down $_percentChange% from last week',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                   const SizedBox(height: 15),
                   DropdownButton<String>(
@@ -391,8 +391,8 @@ class _TrendsPageState extends State<TrendsPage> {
                               isVisible: true,
                               color: Colors.black,
                               shape: DataMarkerType.circle,
-                              height: 4.0,
-                              width: 4.0),
+                              height: 6.0,
+                              width: 6.0),
                           color: Colors.black,
                           xValueMapper: (datum, _) => datum['date'] as String,
                           yValueMapper: (datum, _) =>
@@ -407,8 +407,8 @@ class _TrendsPageState extends State<TrendsPage> {
                               isVisible: true,
                               color: Colors.grey,
                               shape: DataMarkerType.circle,
-                              height: 4.0,
-                              width: 4.0),
+                              height: 6.0,
+                              width: 6.0),
                           color: Colors.grey,
                           xValueMapper: (datum, _) => datum['date'] as String,
                           yValueMapper: (datum, _) =>
@@ -421,75 +421,40 @@ class _TrendsPageState extends State<TrendsPage> {
                     ),
                   ),
                   const SizedBox(height: 50),
-                  DropdownButton<String>(
-                    value: _selectedScale,
-                    alignment: AlignmentDirectional.center,
-                    dropdownColor: Colors.white70,
-                    items: <String>['Turns Taken', 'Time Spent (mins)']
-                        .map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        setState(() {
-                          _selectedScale = newValue!;
-                          _loading = false;
-                        });
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 25),
                   SizedBox(
-                    height: 350,
-                    child: SfCircularChart(
-                      backgroundColor: Colors.transparent,
-                      tooltipBehavior: TooltipBehavior(
-                          enable: true,
-                          animationDuration: 100,
-                          duration: 2000,
-                          shouldAlwaysShow: false,
-                          activationMode: ActivationMode.singleTap),
+                    height: 450,
+                    child: SfCartesianChart(
                       title: const ChartTitle(
                           text: 'Turn Taking By Time of Day',
-                          textStyle: TextStyle(fontWeight: FontWeight.bold)),
-                      legend: const Legend(
-                          isVisible: true,
-                          position: LegendPosition.top,
-                          alignment: ChartAlignment.center,
-                          orientation: LegendItemOrientation.auto,
-                          overflowMode: LegendItemOverflowMode.wrap,
-                          padding: 12,
+                          textStyle: TextStyle(fontWeight: FontWeight.bold)
                       ),
-                      palette: <Color>[
-                        Colors.white,
-                        Colors.grey.shade300,
-                        Colors.grey.shade500,
-                        Colors.grey.shade800,
-                        Colors.black,
-                        Colors.yellow.shade200,
-                        Colors.yellow.shade600,
-                        Colors.yellow.shade800,
-                        Colors.blue.shade200,
-                        Colors.blue.shade400,
-                        Colors.blue.shade800,
-                      ],
-                      series: <PieSeries<Map<String, dynamic>, String>>[
-                        PieSeries<Map<String, dynamic>, String>(
+                      primaryXAxis: const CategoryAxis(isInversed: true,),
+                      primaryYAxis: const NumericAxis(),
+                      series: <BarSeries>[
+                        BarSeries<Map<String, dynamic>, String>(
                           dataSource: _pieData,
-                          xValueMapper: (datum, _) => datum['option'] as String,
-                          yValueMapper: (datum, _) =>
-                              _selectedScale == 'Turns Taken'
-                                  ? datum['turnsTaken'] as int
-                                  : datum['timeSpent'] as int,
-                          dataLabelSettings: const DataLabelSettings(
-                            isVisible: true,
-                            labelPosition: ChartDataLabelPosition.outside,
-                          ),
+                          xValueMapper: (Map<String, dynamic> data, _) =>
+                              data['option'] as String,
+                          yValueMapper: (Map<String, dynamic> data, _) =>
+                              data['turnsTaken'] as int,
+                          name: 'Turns Taken',
+                          color: Colors.black,
+                        ),
+                        BarSeries<Map<String, dynamic>, String>(
+                          dataSource: _pieData,
+                          xValueMapper: (Map<String, dynamic> data, _) =>
+                              data['option'] as String,
+                          yValueMapper: (Map<String, dynamic> data, _) =>
+                              dp((data['timeSpent'] / 60), 2),
+                          name: 'Time Spent',
+                          color: Colors.grey,
                         ),
                       ],
+                      legend: const Legend(
+                          isVisible: true,
+                        position: LegendPosition.top
+                      ),
+                      tooltipBehavior: TooltipBehavior(enable: true),
                     ),
                   ),
                 ],

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding, timeDilation;
 import 'package:flutter_login/flutter_login.dart';
@@ -78,6 +79,13 @@ class _LoginScreen extends State<LoginScreen> {
           password: data.password!,
         );
         await credential.user?.sendEmailVerification();
+        final userId = credential.user!.uid;
+        await FirebaseFirestore.instance.collection('users').doc(userId).set({
+          'username': data.name?.split('@')[0],
+          'type': 'x',
+          // x denotes parent, y denotes psychologist
+          // manually change in firebase upon psych sign up
+        });
         LoginScreen.loggedIn = false;
         showDialog(
           context: context,

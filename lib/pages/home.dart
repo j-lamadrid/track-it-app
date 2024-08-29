@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    userId = _auth.currentUser!.uid;
+    String userId = _auth.currentUser!.uid;
   }
 
   @override
@@ -218,10 +218,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                 AssetImage('lib/images/manual.png'),
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const ManualPage()),
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Unavailable'),
+                                      content: const Text(
+                                          'This page is currently in development.'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('OK'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
                               iconSize: 60.0,
@@ -258,10 +271,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                 AssetImage('lib/images/goals.png'),
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const GoalsPage()),
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Unavailable'),
+                                      content: const Text(
+                                          'This page is currently in development.'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('OK'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
                               iconSize: 60.0,
@@ -296,8 +322,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => ContactListScreen(
-                                          userId: userId)),
+                                      builder: (context) =>
+                                          ContactListScreen()),
                                 );
                               },
                               iconSize: 60.0,

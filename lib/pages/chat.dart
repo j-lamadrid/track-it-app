@@ -1,20 +1,8 @@
-import 'package:edge_alerts/edge_alerts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:track_it/pages/contacts.dart';
-import 'package:track_it/pages/widgets/constants.dart';
-
-// new message structure :
-// Doc - channelId (userId) -> (to (id), from (id), time, content)
-
-final _firestore = FirebaseFirestore.instance;
-final _user = FirebaseAuth.instance.currentUser!;
-String userId = _user.uid;
-String? email = _user.email;
-String messageText = '';
-String psychId = '';
-String? displayName = email?.split('@')[0];
+import 'contacts.dart';
+import 'widgets/constants.dart';
 
 class ChatterScreen extends StatefulWidget {
   final String receiverId;
@@ -31,12 +19,27 @@ class _ChatterScreenState extends State<ChatterScreen> {
   final _firestore = FirebaseFirestore.instance;
 
   late String userId;
+  late String receiverId;
+  late String receiverName;
+  String? channelId;
   String messageText = '';
 
   @override
   void initState() {
     super.initState();
     userId = _auth.currentUser!.uid;
+    receiverId = widget.receiverId;
+  }
+
+  Future<String?> _getChannelId() async {
+    DocumentSnapshot<Map<String, dynamic>> userDoc = await _firestore
+        .collection('users')
+        .doc(receiverId)
+        .get();
+    receiverName = userDoc.data()?['username'] ?? 'Unknown';
+    DocumentSnapshot<Map<String, dynamic>> contactDoc =
+        await _firestore.collection('contacts').doc(userId).get();
+    return contactDoc.data()?[widget.receiverId];
   }
 
   @override
@@ -49,8 +52,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => ContactListScreen(userId: userId)),
+              MaterialPageRoute(builder: (context) => ContactListScreen()),
             );
           },
         ),
@@ -64,70 +66,92 @@ class _ChatterScreenState extends State<ChatterScreen> {
           ),
         ),
       ),
-      body: SizedBox.expand(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                child: ChatStream(
-                  userId: userId,
-                  receiverId: widget.receiverId,
+      body: FutureBuilder<String?>(
+        future: _getChannelId(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error fetching chat data'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('No chat channel found'));
+          } else {
+            channelId = snapshot.data!;
+            return SizedBox.expand(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueAccent[100]!, Colors.yellow[100]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                decoration: kMessageContainerDecoration,
-                child: Row(
+                child: Column(
                   children: [
                     Expanded(
-                      child: Material(
-                        borderRadius: BorderRadius.circular(50),
-                        color: Colors.white,
-                        elevation: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 2, bottom: 2),
-                          child: TextField(
-                            onChanged: (value) {
-                              messageText = value;
-                            },
-                            controller: chatMsgTextController,
-                            decoration: kMessageTextFieldDecoration,
-                          ),
-                        ),
+                      child: ChatStream(
+                        userId: userId,
+                        receiverName: receiverName,
+                        channelId: channelId!,
                       ),
                     ),
-                    MaterialButton(
-                      shape: const CircleBorder(),
-                      color: Colors.black,
-                      onPressed: () {
-                        _firestore.collection('messages').add({
-                          'sender': userId,
-                          'receiver': widget.receiverId,
-                          'text': messageText,
-                          'timestamp': DateTime.now().millisecondsSinceEpoch,
-                        });
-                        chatMsgTextController.clear();
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Icon(Icons.send, color: Colors.white),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      decoration: kMessageContainerDecoration,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Material(
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.white,
+                              elevation: 5,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 8.0, top: 2, bottom: 2),
+                                child: TextField(
+                                  onChanged: (value) {
+                                    messageText = value;
+                                  },
+                                  controller: chatMsgTextController,
+                                  decoration: kMessageTextFieldDecoration,
+                                ),
+                              ),
+                            ),
+                          ),
+                          MaterialButton(
+                            shape: const CircleBorder(),
+                            color: Colors.black,
+                            onPressed: () {
+                              if (messageText.isNotEmpty) {
+                                _firestore
+                                    .collection('messages')
+                                    .doc(channelId)
+                                    .collection('chats')
+                                    .add({
+                                  'sender': userId,
+                                  'receiver': widget.receiverId,
+                                  'text': messageText,
+                                  'timestamp':
+                                      DateTime.now().millisecondsSinceEpoch,
+                                });
+                                chatMsgTextController.clear();
+                              }
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Icon(Icons.send, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+          }
+        },
       ),
     );
   }
@@ -135,9 +159,14 @@ class _ChatterScreenState extends State<ChatterScreen> {
 
 class ChatStream extends StatelessWidget {
   final String userId;
-  final String receiverId;
+  final String receiverName;
+  final String channelId;
 
-  const ChatStream({Key? key, required this.userId, required this.receiverId})
+  ChatStream(
+      {Key? key,
+      required this.userId,
+      required this.receiverName,
+      required this.channelId})
       : super(key: key);
 
   @override
@@ -145,13 +174,13 @@ class ChatStream extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('messages')
-          .where('sender', isEqualTo: userId)
-          .where('receiver', isEqualTo: receiverId)
-          .orderBy('timestamp')
+          .doc(channelId)
+          .collection('chats')
+          .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final messages = snapshot.data!.docs.reversed;
+          final messages = snapshot.data!.docs;
           List<MessageBubble> messageWidgets = [];
 
           for (var message in messages) {
@@ -160,7 +189,7 @@ class ChatStream extends StatelessWidget {
 
             final msgBubble = MessageBubble(
               msgText: msgText,
-              msgSender: msgSenderId == userId ? 'You' : 'Contact',
+              msgSender: msgSenderId == userId ? 'You' : receiverName,
               user: msgSenderId == userId,
             );
             messageWidgets.add(msgBubble);
@@ -186,11 +215,12 @@ class MessageBubble extends StatelessWidget {
   final String msgSender;
   final bool user;
 
-  const MessageBubble(
-      {super.key,
-      required this.msgText,
-      required this.msgSender,
-      required this.user});
+  const MessageBubble({
+    super.key,
+    required this.msgText,
+    required this.msgSender,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
