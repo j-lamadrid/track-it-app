@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +7,7 @@ import 'home.dart';
 import 'add_contact.dart';  // Import the new screen
 
 class ContactListScreen extends StatefulWidget {
-  ContactListScreen({Key? key}) : super(key: key);
+  const ContactListScreen({super.key});
 
   @override
   _ContactListScreenState createState() => _ContactListScreenState();
@@ -16,8 +17,8 @@ class _ContactListScreenState extends State<ContactListScreen> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
   Map<String, String> _contacts = {};
-  Map<String, String> _latestMessages = {};
-  Map<String, String> _contactEmails = {};
+  final Map<String, String> _latestMessages = {};
+  final Map<String, String> _contactEmails = {};
   bool _loading = true;
   bool _error = false;
   bool _isAuthorized = false;
@@ -125,8 +126,8 @@ class _ContactListScreenState extends State<ContactListScreen> {
     if (_isAuthorized) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => AddContactScreen(),
+        CupertinoPageRoute(
+          builder: (context) => const AddContactScreen(),
         ),
       );
     } else {
@@ -157,12 +158,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MyHomePage(title: 'Home Page'),
-              ),
-            );
+            Navigator.pop(context);
           },
         ),
         flexibleSpace: Container(
@@ -238,8 +234,8 @@ class _ContactListScreenState extends State<ContactListScreen> {
               right: 16,
               child: FloatingActionButton(
                 onPressed: _handleAddContact,
-                child: const Icon(Icons.add),
                 backgroundColor: Colors.black87,
+                child: const Icon(Icons.add),
               ),
             ),
           ],

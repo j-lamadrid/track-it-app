@@ -7,7 +7,7 @@ import 'widgets/constants.dart';
 class ChatterScreen extends StatefulWidget {
   final String receiverId;
 
-  const ChatterScreen({Key? key, required this.receiverId}) : super(key: key);
+  const ChatterScreen({super.key, required this.receiverId});
 
   @override
   _ChatterScreenState createState() => _ChatterScreenState();
@@ -50,10 +50,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ContactListScreen()),
-            );
+            Navigator.pop(context);
           },
         ),
         flexibleSpace: Container(
@@ -134,6 +131,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
                                   'text': messageText,
                                   'timestamp':
                                       DateTime.now().millisecondsSinceEpoch,
+                                  'isRead': false,
                                 });
                                 chatMsgTextController.clear();
                               }
@@ -162,12 +160,11 @@ class ChatStream extends StatelessWidget {
   final String receiverName;
   final String channelId;
 
-  ChatStream(
-      {Key? key,
+   const ChatStream(
+      {super.key,
       required this.userId,
       required this.receiverName,
-      required this.channelId})
-      : super(key: key);
+      required this.channelId});
 
   @override
   Widget build(BuildContext context) {
@@ -225,19 +222,19 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(5.0),
       child: Column(
         crossAxisAlignment:
             user ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              msgSender,
-              style: const TextStyle(
-                  fontSize: 13, fontFamily: 'OpenSans', color: Colors.black87),
-            ),
-          ),
+          //Container(
+          //  padding: const EdgeInsets.symmetric(horizontal: 10),
+          //  child: Text(
+          //    msgSender,
+          //    style: const TextStyle(
+          //        fontSize: 13, fontFamily: 'OpenSans', color: Colors.black87),
+          //  ),
+          //),
           Material(
             borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(50),

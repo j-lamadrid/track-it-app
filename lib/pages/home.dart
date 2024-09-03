@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:track_it/pages/chat.dart';
 import 'package:track_it/pages/contacts.dart';
-import 'package:track_it/pages/goals.dart';
-import 'package:track_it/pages/manual.dart';
 import 'package:track_it/pages/my_day.dart';
 import 'package:track_it/pages/trends.dart';
 import 'package:track_it/pages/strategy.dart';
@@ -104,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                       builder: (context) => const MyDayPage(
                                             title: 'My Day',
                                           )),
@@ -141,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                       builder: (context) => const TrendsPage(
                                             title: 'Trends Over Time',
                                           )),
@@ -183,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                       builder: (context) => const StrategyPage(
                                             title: 'ASE Strategies',
                                           )),
@@ -321,9 +319,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  CupertinoPageRoute(
                                       builder: (context) =>
-                                          ContactListScreen()),
+                                          const ContactListScreen()),
                                 );
                               },
                               iconSize: 60.0,

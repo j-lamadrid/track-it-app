@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AddContactScreen extends StatefulWidget {
+  const AddContactScreen({super.key});
+
   @override
   _AddContactScreenState createState() => _AddContactScreenState();
 }
@@ -87,7 +89,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User added to contacts')),
+          const SnackBar(content: Text('User added to contacts')),
         );
 
         // Update the list of added users and refresh the list

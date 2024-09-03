@@ -149,11 +149,7 @@ class _MyDayPage extends State<MyDayPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const MyHomePage(title: 'Home Page')),
-            );
+            Navigator.pop(context);
           },
         ),
         flexibleSpace: Container(

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:track_it/pages/home.dart';
@@ -19,7 +20,7 @@ class _TrendsPageState extends State<TrendsPage> {
   List<Map<String, dynamic>> _pieData = [];
   bool _loading = true;
   String _selectedRange = 'Past 7 Days';
-  String _selectedScale = 'Turns Taken';
+  final String _selectedScale = 'Turns Taken';
   int _turnsLastWeek = 0;
   int _turnsWeekBeforeLast = 0;
   bool _isTurnTrendUp = false;
@@ -270,11 +271,7 @@ class _TrendsPageState extends State<TrendsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const MyHomePage(title: 'Home Page')),
-            );
+            Navigator.pop(context);
           },
         ),
         flexibleSpace: Container(
@@ -432,6 +429,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       primaryYAxis: const NumericAxis(),
                       series: <BarSeries>[
                         BarSeries<Map<String, dynamic>, String>(
+                          legendIconType: LegendIconType.rectangle,
                           dataSource: _pieData,
                           xValueMapper: (Map<String, dynamic> data, _) =>
                               data['option'] as String,
@@ -441,6 +439,7 @@ class _TrendsPageState extends State<TrendsPage> {
                           color: Colors.black,
                         ),
                         BarSeries<Map<String, dynamic>, String>(
+                          legendIconType: LegendIconType.rectangle,
                           dataSource: _pieData,
                           xValueMapper: (Map<String, dynamic> data, _) =>
                               data['option'] as String,
@@ -452,7 +451,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       ],
                       legend: const Legend(
                           isVisible: true,
-                        position: LegendPosition.top
+                        position: LegendPosition.top,
                       ),
                       tooltipBehavior: TooltipBehavior(enable: true),
                     ),
