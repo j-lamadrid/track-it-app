@@ -1,13 +1,13 @@
 # Treatment Engagement Parent App
 
-## Examples
+## Example Screens
 
-![login](lib/images/IMG_4655.PNG)
-![home](lib/images/IMG_4656.PNG)
-![times of day](lib/images/IMG_4650.PNG)
-![trends](lib/images/IMG_4649.PNG)
-![strategies](lib/images/IMG_4651.PNG)
-![chat](lib/images/IMG_4652.PNG)
+<img src="lib/images/IMG_4655.PNG" alt="login" width="150"/>
+<img src="lib/images/IMG_4656.PNG" alt="home" width="150"/>
+<img src="lib/images/IMG_4650.PNG" alt="times of day" width="150"/>
+<img src="lib/images/IMG_4649.PNG" alt="trends" width="150"/>
+<img src="lib/images/IMG_4651.PNG" alt="strategies" width="150"/>
+<img src="lib/images/IMG_4652.PNG" alt="chat" width="150"/>
 
 ## Instructions for Phone Setup
 1. Visit https://track-it-app-b875b.web.app/ from your mobile browser (i.e. Chrome, Safari, etc.)
