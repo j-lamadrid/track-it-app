@@ -6,7 +6,7 @@
 3. Choose 'Add to Home Screen' (Optionally rename the shortcut)
 4. Sign up via email and wait for an authentication link
    1. If link is not sent please reach out
-5. After successful sign up and logging in, the app is ready for logging and you will be connected with your expected contacts shortly
+5. After successful sign up and log in, the app is ready for logging data, and you will be connected with your expected contacts shortly
 
 ## General App Notes
 - 'Trends' will not function properly until a sufficient amount of data has been logged

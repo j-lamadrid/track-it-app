@@ -12,8 +12,10 @@ class AddContactScreen extends StatefulWidget {
 class _AddContactScreenState extends State<AddContactScreen> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
+  final TextEditingController _searchController = TextEditingController();
   List<DocumentSnapshot> _users = [];
-  Set<String> _addedUserIds = {};  // Track IDs of already added users
+  List<DocumentSnapshot> _filteredUsers = []; // For filtered user results
+  Set<String> _addedUserIds = {};
   bool _loading = true;
   bool _error = false;
 
@@ -21,6 +23,13 @@ class _AddContactScreenState extends State<AddContactScreen> {
   void initState() {
     super.initState();
     _fetchUsers();
+    _searchController.addListener(_filterUsers); // Listen to search query changes
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchUsers() async {
@@ -29,7 +38,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
       if (currentUser != null) {
         String userId = currentUser.uid;
 
-        // Fetch the user's contacts
         DocumentSnapshot contactsSnapshot = await _firestore.collection('contacts').doc(userId).get();
         Map<String, dynamic>? contactsData = contactsSnapshot.data() as Map<String, dynamic>?;
         if (contactsData != null) {
@@ -38,12 +46,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
           });
         }
 
-        // Fetch all users
         QuerySnapshot usersSnapshot = await _firestore.collection('users').get();
         setState(() {
           _users = usersSnapshot.docs
-              .where((doc) => doc.id != userId && !_addedUserIds.contains(doc.id))  // Filter out already added users
+              .where((doc) => doc.id != userId && !_addedUserIds.contains(doc.id))
               .toList();
+          _filteredUsers = _users; // Initialize filtered list
           _loading = false;
         });
       } else {
@@ -61,17 +69,25 @@ class _AddContactScreenState extends State<AddContactScreen> {
     }
   }
 
+  void _filterUsers() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredUsers = _users.where((user) {
+        String username = (user['username'] ?? 'Unknown').toLowerCase();
+        return username.contains(query);
+      }).toList();
+    });
+  }
+
   Future<void> _addContact(String otherUserId) async {
     try {
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
         String userId = currentUser.uid;
 
-        // Create a new document in the messages collection to generate a unique channel ID
         DocumentReference newChannelRef = _firestore.collection('messages').doc();
         String channelId = newChannelRef.id;
 
-        // Add to contacts collection for both users
         await _firestore.collection('contacts').doc(userId).set(
           {otherUserId: channelId},
           SetOptions(merge: true),
@@ -82,7 +98,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
           SetOptions(merge: true),
         );
 
-        // Create an entry in the messages collection for the new channel
         await newChannelRef.set({
           'participants': [userId, otherUserId],
           'created_at': Timestamp.now(),
@@ -92,13 +107,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
           const SnackBar(content: Text('User added to contacts')),
         );
 
-        // Update the list of added users and refresh the list
         setState(() {
           _addedUserIds.add(otherUserId);
           _users.removeWhere((user) => user.id == otherUserId);
+          _filteredUsers = _users; // Update the filtered list
         });
 
-        // Optionally, navigate back to the contact list
         Navigator.pop(context);
       }
     } catch (e) {
@@ -133,23 +147,42 @@ class _AddContactScreenState extends State<AddContactScreen> {
             ? const Center(child: CircularProgressIndicator())
             : _error
             ? const Center(child: Text('Error fetching users'))
-            : _users.isEmpty
-            ? const Center(child: Text('No users available'))
-            : ListView.builder(
-          itemCount: _users.length,
-          itemBuilder: (context, index) {
-            var user = _users[index];
-            String username = user['username'] ?? 'Unknown';
-            String userId = user.id;
-
-            return ListTile(
-              title: Text(username),
-              trailing: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () => _addContact(userId),
+            : Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search Users',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  prefixIcon: const Icon(Icons.search),
+                ),
               ),
-            );
-          },
+            ),
+            Expanded(
+              child: _filteredUsers.isEmpty
+                  ? const Center(child: Text('No users available'))
+                  : ListView.builder(
+                itemCount: _filteredUsers.length,
+                itemBuilder: (context, index) {
+                  var user = _filteredUsers[index];
+                  String username = user['username'] ?? 'Unknown';
+                  String userId = user.id;
+
+                  return ListTile(
+                    title: Text(username),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () => _addContact(userId),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

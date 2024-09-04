@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:track_it/pages/home.dart';
@@ -367,20 +366,26 @@ class _TrendsPageState extends State<TrendsPage> {
                           duration: 2000,
                           shouldAlwaysShow: false,
                           activationMode: ActivationMode.singleTap),
-                      primaryXAxis: const CategoryAxis(
+                      primaryXAxis: CategoryAxis(
                         //title: AxisTitle(text: 'Date'),
                         labelRotation: 45,
                         autoScrollingMode: AutoScrollingMode.end,
                         labelIntersectAction: AxisLabelIntersectAction.rotate45,
+                          axisLine: const AxisLine(color: Colors.black26),
+                          labelStyle: const TextStyle(color: Colors.black),
+                          majorGridLines: const MajorGridLines(color: Colors.black12)
                       ),
-                      primaryYAxis: const NumericAxis(
+                      primaryYAxis: NumericAxis(
                         //title: AxisTitle(text: 'Count'),
                         autoScrollingMode: AutoScrollingMode.end,
                         labelIntersectAction: AxisLabelIntersectAction.rotate45,
+                          axisLine: const AxisLine(color: Colors.black26),
+                          labelStyle: const TextStyle(color: Colors.black),
+                          majorGridLines: const MajorGridLines(color: Colors.black12)
                       ),
-                      title: const ChartTitle(
+                      title: ChartTitle(
                           text: 'Trends in Turn Taking',
-                          textStyle: TextStyle(fontWeight: FontWeight.bold)),
+                          textStyle: const TextStyle(fontWeight: FontWeight.bold)),
                       series: <LineSeries<Map<String, dynamic>, String>>[
                         LineSeries<Map<String, dynamic>, String>(
                           dataSource: _data,
@@ -421,12 +426,25 @@ class _TrendsPageState extends State<TrendsPage> {
                   SizedBox(
                     height: 450,
                     child: SfCartesianChart(
-                      title: const ChartTitle(
+                      //plotAreaBorderColor: Colors.black,
+                      //plotAreaBackgroundColor: Colors.black12,
+                      title: ChartTitle(
                           text: 'Turn Taking By Time of Day',
-                          textStyle: TextStyle(fontWeight: FontWeight.bold)
+                          textStyle: const TextStyle(fontWeight: FontWeight.bold)
                       ),
-                      primaryXAxis: const CategoryAxis(isInversed: true,),
-                      primaryYAxis: const NumericAxis(),
+                      primaryXAxis: CategoryAxis(
+                        isInversed: true,
+                        borderColor: Colors.black,
+                          axisLine: const AxisLine(color: Colors.black26),
+                          labelStyle: const TextStyle(color: Colors.black),
+                          majorGridLines: const MajorGridLines(color: Colors.black12)
+                      ),
+                      primaryYAxis: NumericAxis(
+                          borderColor: Colors.black,
+                          axisLine: const AxisLine(color: Colors.black26),
+                          labelStyle: const TextStyle(color: Colors.black),
+                          majorGridLines: const MajorGridLines(color: Colors.black12)
+                      ),
                       series: <BarSeries>[
                         BarSeries<Map<String, dynamic>, String>(
                           legendIconType: LegendIconType.rectangle,
