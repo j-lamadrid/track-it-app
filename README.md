@@ -3,12 +3,12 @@
 ## Example Screens
 
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-    <img src="lib/images/IMG_4655.PNG" alt="login" width="200"/>
-    <img src="lib/images/IMG_4656.PNG" alt="home" width="200"/>
-    <img src="lib/images/IMG_4650.PNG" alt="times of day" width="200"/>
-    <img src="lib/images/IMG_4649.PNG" alt="trends" width="200"/>
-    <img src="lib/images/IMG_4651.PNG" alt="strategies" width="200"/>
-    <img src="lib/images/IMG_4652.PNG" alt="chat" width="200"/>
+    <img src="lib/images/IMG_4655.PNG" alt="login" width="250"/>
+    <img src="lib/images/IMG_4656.PNG" alt="home" width="250"/>
+    <img src="lib/images/IMG_4650.PNG" alt="times of day" width="250"/>
+    <img src="lib/images/IMG_4649.PNG" alt="trends" width="250"/>
+    <img src="lib/images/IMG_4651.PNG" alt="strategies" width="250"/>
+    <img src="lib/images/IMG_4652.PNG" alt="chat" width="250"/>
 </div>
 
 ## Instructions for Phone Setup
