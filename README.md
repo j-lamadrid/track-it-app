@@ -1,5 +1,14 @@
 # Treatment Engagement Parent App
 
+## Examples
+
+![login](lib/images/IMG_4655.PNG)
+![home](lib/images/IMG_4656.PNG)
+![times of day](lib/images/IMG_4650.PNG)
+![trends](lib/images/IMG_4649.PNG)
+![strategies](lib/images/IMG_4651.PNG)
+![chat](lib/images/IMG_4652.PNG)
+
 ## Instructions for Phone Setup
 1. Visit https://track-it-app-b875b.web.app/ from your mobile browser (i.e. Chrome, Safari, etc.)
 2. Tap on the share website icon
@@ -23,7 +32,7 @@
 
 #### Trends
 
-- Axis labels of the line chart randomly disappear
+- Axis label disappearance solved 09/04/2024
 
 #### ASE Strategies
 
