@@ -2,12 +2,14 @@
 
 ## Example Screens
 
-<img src="lib/images/IMG_4655.PNG" alt="login" width="150"/>
-<img src="lib/images/IMG_4656.PNG" alt="home" width="150"/>
-<img src="lib/images/IMG_4650.PNG" alt="times of day" width="150"/>
-<img src="lib/images/IMG_4649.PNG" alt="trends" width="150"/>
-<img src="lib/images/IMG_4651.PNG" alt="strategies" width="150"/>
-<img src="lib/images/IMG_4652.PNG" alt="chat" width="150"/>
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <img src="lib/images/IMG_4655.PNG" alt="login" width="200"/>
+    <img src="lib/images/IMG_4656.PNG" alt="home" width="200"/>
+    <img src="lib/images/IMG_4650.PNG" alt="times of day" width="200"/>
+    <img src="lib/images/IMG_4649.PNG" alt="trends" width="200"/>
+    <img src="lib/images/IMG_4651.PNG" alt="strategies" width="200"/>
+    <img src="lib/images/IMG_4652.PNG" alt="chat" width="200"/>
+</div>
 
 ## Instructions for Phone Setup
 1. Visit https://track-it-app-b875b.web.app/ from your mobile browser (i.e. Chrome, Safari, etc.)
