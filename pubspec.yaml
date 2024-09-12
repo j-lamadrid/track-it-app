@@ -50,7 +50,6 @@ dependencies:
   firebase_in_app_messaging: ^0.8.0+1
 
   url_launcher_web: any
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

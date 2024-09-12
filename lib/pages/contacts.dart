@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'chat.dart';
-import 'home.dart';
-import 'add_contact.dart';  // Import the new screen
+import 'add_contact.dart';
 
 class ContactListScreen extends StatefulWidget {
   const ContactListScreen({super.key});
@@ -16,9 +15,8 @@ class ContactListScreen extends StatefulWidget {
 class _ContactListScreenState extends State<ContactListScreen> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-  Map<String, String> _contacts = {};
+  Map<String, Map<String, String>> _contacts = {}; // Stores contact details (email, type)
   final Map<String, String> _latestMessages = {};
-  final Map<String, String> _contactEmails = {};
   bool _loading = true;
   bool _error = false;
   bool _isAuthorized = false;
@@ -47,7 +45,10 @@ class _ContactListScreenState extends State<ContactListScreen> {
           if (snapshot.exists) {
             Map<String, dynamic>? data = snapshot.data();
             if (data != null) {
-              Map<String, String> contacts = Map<String, String>.from(data);
+              Map<String, Map<String, String>> contacts = {};
+              data.forEach((receiverId, details) {
+                contacts[receiverId] = Map<String, String>.from(details);
+              });
               setState(() {
                 _contacts = contacts;
               });
@@ -81,7 +82,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
     }
   }
 
-  Future<void> _fetchContactEmailsAndMessages(Map<String, String> contacts) async {
+  Future<void> _fetchContactEmailsAndMessages(Map<String, Map<String, String>> contacts) async {
     try {
       for (String receiverId in contacts.keys) {
         DocumentSnapshot<Map<String, dynamic>> userDoc =
@@ -89,10 +90,10 @@ class _ContactListScreenState extends State<ContactListScreen> {
         String email = userDoc.data()?['username'] ?? 'Unknown';
 
         setState(() {
-          _contactEmails[receiverId] = email;
+          _contacts[receiverId]!['email'] = email;
         });
 
-        String channelId = contacts[receiverId]!;
+        String channelId = contacts[receiverId]!['channelId']!;
         QuerySnapshot<Map<String, dynamic>> messagesSnapshot =
         await _firestore
             .collection('messages')
@@ -135,8 +136,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Unavailable'),
-          content: const Text('Parents please email us at ___@gmail.com to '
-              'request a contact.'),
+          content: const Text('Parents please email us at ___@gmail.com to request a contact.'),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
@@ -149,6 +149,92 @@ class _ContactListScreenState extends State<ContactListScreen> {
       );
     }
   }
+
+  void _deleteContact(String receiverId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Contact?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                String userId = _auth.currentUser!.uid;
+                _firestore.collection('contacts').doc(userId).update({
+                  receiverId: FieldValue.delete(),
+                });
+                _firestore.collection('contacts').doc(receiverId).update({
+                  userId: FieldValue.delete(),
+                });
+                setState(() {
+                  _contacts.remove(receiverId);
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _changeProviderType(String receiverId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String newType = '';
+        return AlertDialog(
+          title: const Text('Change Provider Type'),
+          content: DropdownButton<String>(
+            value: newType.isEmpty ? null : newType,
+            hint: const Text('Select provider type'),
+            onChanged: (String? value) {
+              setState(() {
+                newType = value ?? '';
+              });
+            },
+            items: const [
+              DropdownMenuItem<String>(
+                value: 'Primary',
+                child: Text('Primary'),
+              ),
+              DropdownMenuItem<String>(
+                value: 'Secondary',
+                child: Text('Secondary'),
+              ),
+              DropdownMenuItem<String>(
+                value: '',
+                child: Text('Other'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (newType.isNotEmpty) {
+                  _firestore.collection('contacts').doc(_auth.currentUser!.uid).update({
+                    '$receiverId.type': newType,
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Change'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +267,6 @@ class _ContactListScreenState extends State<ContactListScreen> {
         ),
         child: Stack(
           children: [
-            // Main contact list view
             _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _error
@@ -191,44 +276,50 @@ class _ContactListScreenState extends State<ContactListScreen> {
                 : ListView.builder(
               itemCount: _contacts.length,
               itemBuilder: (context, index) {
-                String receiverId =
-                _contacts.keys.elementAt(index);
-                String email =
-                    _contactEmails[receiverId] ?? 'Unknown';
-                String latestMessage =
-                    _latestMessages[receiverId] ??
-                        'No messages';
+                String receiverId = _contacts.keys.elementAt(index);
+                String email = _contacts[receiverId]!['email'] ?? 'Unknown';
+                String type = _contacts[receiverId]!['type'] ?? 'Unknown';
+                String latestMessage = _latestMessages[receiverId] ?? 'No messages';
 
-                return ListTile(
-                  leading: const Icon(Icons.account_circle, size: 40),
-                  title: Text(
-                    email,
-                    textHeightBehavior: const TextHeightBehavior(
-                        leadingDistribution:
-                        TextLeadingDistribution.even),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold),
+                return Dismissible(
+                  direction: DismissDirection.startToEnd,
+                  key: Key(receiverId),
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  subtitle: Text(
-                    latestMessage,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  tileColor: Colors.white24,
-                  style: ListTileStyle.list,
-                  minVerticalPadding: 15,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ChatterScreen(receiverId: receiverId),
-                      ),
-                    );
+                  onDismissed: (direction) {
+                    _deleteContact(receiverId);
                   },
+                  child: ListTile(
+                    leading: const Icon(Icons.account_circle, size: 40),
+                    title: Text(
+                      type.isNotEmpty
+                          ? '$type Provider: $email'
+                          : 'Provider: $email',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      latestMessage,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatterScreen(
+                            receiverId: receiverId,
+                            chatName: '$type Provider: $email',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
-            // Floating action button for adding contacts
             Positioned(
               bottom: 16,
               right: 16,
@@ -244,3 +335,4 @@ class _ContactListScreenState extends State<ContactListScreen> {
     );
   }
 }
+

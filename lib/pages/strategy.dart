@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:track_it/pages/home.dart';
 
 class StrategyPage extends StatefulWidget {
   const StrategyPage({super.key, required this.title});

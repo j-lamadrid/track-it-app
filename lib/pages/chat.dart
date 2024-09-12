@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'contacts.dart';
 import 'widgets/constants.dart';
 
 class ChatterScreen extends StatefulWidget {
   final String receiverId;
+  final String chatName;
 
-  const ChatterScreen({super.key, required this.receiverId});
+  const ChatterScreen({super.key,
+    required this.receiverId,
+    required this.chatName});
 
   @override
   _ChatterScreenState createState() => _ChatterScreenState();
@@ -20,7 +22,8 @@ class _ChatterScreenState extends State<ChatterScreen> {
 
   late String userId;
   late String receiverId;
-  late String receiverName;
+  late String chatName;
+  String? receiverName;
   String? channelId;
   String messageText = '';
 
@@ -29,24 +32,35 @@ class _ChatterScreenState extends State<ChatterScreen> {
     super.initState();
     userId = _auth.currentUser!.uid;
     receiverId = widget.receiverId;
+    chatName = widget.chatName;
+    _fetchReceiverName();
   }
 
-  Future<String?> _getChannelId() async {
+  Future<void> _fetchReceiverName() async {
     DocumentSnapshot<Map<String, dynamic>> userDoc = await _firestore
         .collection('users')
         .doc(receiverId)
         .get();
-    receiverName = userDoc.data()?['username'] ?? 'Unknown';
+
+    setState(() {
+      receiverName = userDoc.data()?['username'] ?? 'Unknown';
+    });
+  }
+
+  Future<String?> _getChannelId() async {
     DocumentSnapshot<Map<String, dynamic>> contactDoc =
-        await _firestore.collection('contacts').doc(userId).get();
-    return contactDoc.data()?[widget.receiverId];
+    await _firestore.collection('contacts').doc(userId).get();
+    return contactDoc.data()?[widget.receiverId]['channelId'];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: Text(
+            chatName,
+          style: const TextStyle(fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -88,7 +102,7 @@ class _ChatterScreenState extends State<ChatterScreen> {
                     Expanded(
                       child: ChatStream(
                         userId: userId,
-                        receiverName: receiverName,
+                        receiverName: receiverName ?? 'Unknown',
                         channelId: channelId!,
                       ),
                     ),

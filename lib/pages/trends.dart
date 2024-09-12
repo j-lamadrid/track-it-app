@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:track_it/pages/home.dart';
 
 class TrendsPage extends StatefulWidget {
   const TrendsPage({super.key, required this.title});
@@ -351,6 +350,15 @@ class _TrendsPageState extends State<TrendsPage> {
                         _fetchAndProcessData().then((_) => _loadPieData());
                       });
                     },
+                    underline: Container(
+                      height: 1,
+                      color: Colors.black54,
+                    ),
+                    // Add this for black dropdown arrow
+                    icon: const Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.black,
+                    ),
                   ),
                   SizedBox(
                     height: 500,
@@ -391,11 +399,11 @@ class _TrendsPageState extends State<TrendsPage> {
                           dataSource: _data,
                           markerSettings: const MarkerSettings(
                               isVisible: true,
-                              color: Colors.black,
+                              color: Colors.black87,
                               shape: DataMarkerType.circle,
                               height: 6.0,
                               width: 6.0),
-                          color: Colors.black,
+                          color: Colors.black87,
                           xValueMapper: (datum, _) => datum['date'] as String,
                           yValueMapper: (datum, _) =>
                               datum['turnsTaken'] as num,
@@ -407,11 +415,11 @@ class _TrendsPageState extends State<TrendsPage> {
                           dataSource: _data,
                           markerSettings: const MarkerSettings(
                               isVisible: true,
-                              color: Colors.grey,
+                              color: Colors.blueGrey,
                               shape: DataMarkerType.circle,
                               height: 6.0,
                               width: 6.0),
-                          color: Colors.grey,
+                          color: Colors.blueGrey,
                           xValueMapper: (datum, _) => datum['date'] as String,
                           yValueMapper: (datum, _) =>
                               dp((datum['timeSpent'] / 60), 2),
@@ -429,7 +437,7 @@ class _TrendsPageState extends State<TrendsPage> {
                       //plotAreaBorderColor: Colors.black,
                       //plotAreaBackgroundColor: Colors.black12,
                       title: ChartTitle(
-                          text: 'Turn Taking By Time of Day',
+                          text: 'Turn Taking/Time Spent: $_selectedRange',
                           textStyle: const TextStyle(fontWeight: FontWeight.bold)
                       ),
                       primaryXAxis: CategoryAxis(
@@ -454,7 +462,7 @@ class _TrendsPageState extends State<TrendsPage> {
                           yValueMapper: (Map<String, dynamic> data, _) =>
                               data['turnsTaken'] as int,
                           name: 'Turns Taken',
-                          color: Colors.black,
+                          color: Colors.black87,
                         ),
                         BarSeries<Map<String, dynamic>, String>(
                           legendIconType: LegendIconType.rectangle,
@@ -464,7 +472,7 @@ class _TrendsPageState extends State<TrendsPage> {
                           yValueMapper: (Map<String, dynamic> data, _) =>
                               dp((data['timeSpent'] / 60), 2),
                           name: 'Time Spent',
-                          color: Colors.grey,
+                          color: Colors.blueGrey,
                         ),
                       ],
                       legend: const Legend(

@@ -14,7 +14,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   final _auth = FirebaseAuth.instance;
   final TextEditingController _searchController = TextEditingController();
   List<DocumentSnapshot> _users = [];
-  List<DocumentSnapshot> _filteredUsers = []; // For filtered user results
+  List<DocumentSnapshot> _filteredUsers = [];
   Set<String> _addedUserIds = {};
   bool _loading = true;
   bool _error = false;
@@ -23,7 +23,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   void initState() {
     super.initState();
     _fetchUsers();
-    _searchController.addListener(_filterUsers); // Listen to search query changes
+    _searchController.addListener(_filterUsers);
   }
 
   @override
@@ -79,7 +79,58 @@ class _AddContactScreenState extends State<AddContactScreen> {
     });
   }
 
-  Future<void> _addContact(String otherUserId) async {
+  Future<void> _showProviderTypeDialog(String otherUserId) async {
+    String? selectedProviderType;
+    final List<String> providerTypes = ['Primary', 'Secondary', 'Other'];
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Provider Type'),
+          content: DropdownButtonFormField<String>(
+            value: selectedProviderType,
+            items: providerTypes.map((type) {
+              return DropdownMenuItem<String>(
+                value: type,
+                child: Text(type),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              selectedProviderType = newValue;
+            },
+            decoration: InputDecoration(
+              labelText: 'Provider Type',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Close dialog without action
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog and proceed with adding
+                if (selectedProviderType != null) {
+                  _addContact(otherUserId, selectedProviderType!);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select a provider type')),
+                  );
+                }
+              },
+              child: const Text('Add Contact'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _addContact(String otherUserId, String providerType) async {
     try {
       User? currentUser = _auth.currentUser;
       if (currentUser != null) {
@@ -88,13 +139,20 @@ class _AddContactScreenState extends State<AddContactScreen> {
         DocumentReference newChannelRef = _firestore.collection('messages').doc();
         String channelId = newChannelRef.id;
 
+        // Adding provider type when creating the contact
         await _firestore.collection('contacts').doc(userId).set(
-          {otherUserId: channelId},
+          {otherUserId: {'channelId': channelId,
+            'type': providerType != 'Other'
+              ? providerType
+              : ''}},
           SetOptions(merge: true),
         );
 
         await _firestore.collection('contacts').doc(otherUserId).set(
-          {userId: channelId},
+          {userId: {'channelId': channelId,
+            'type': providerType != 'Other'
+                ? providerType
+                : ''}},
           SetOptions(merge: true),
         );
 
@@ -112,8 +170,6 @@ class _AddContactScreenState extends State<AddContactScreen> {
           _users.removeWhere((user) => user.id == otherUserId);
           _filteredUsers = _users; // Update the filtered list
         });
-
-        Navigator.pop(context);
       }
     } catch (e) {
       print("Error adding contact: $e");
@@ -176,7 +232,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                     title: Text(username),
                     trailing: IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: () => _addContact(userId),
+                      onPressed: () => _showProviderTypeDialog(userId),
                     ),
                   );
                 },
@@ -188,3 +244,4 @@ class _AddContactScreenState extends State<AddContactScreen> {
     );
   }
 }
+
