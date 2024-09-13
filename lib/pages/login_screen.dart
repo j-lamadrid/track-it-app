@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding, timeDilation;
 import 'package:flutter_login/flutter_login.dart';
@@ -37,7 +38,6 @@ class _LoginScreen extends State<LoginScreen> {
       });
     }
   }
-
 
   Future<String?> _loginUser(LoginData data) {
     return Future.delayed(loginTime).then((_) async {
@@ -90,7 +90,7 @@ class _LoginScreen extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Signup Successful'),
+            title: const Text('Sign Up Successful'),
             content: const Text(
                 'User successfully created. Please verify your email before logging in.'),
             actions: [
@@ -142,7 +142,9 @@ class _LoginScreen extends State<LoginScreen> {
       loginAfterSignUp: false,
       userValidator: (value) {
         if ((!value!.contains('@')) ||
-            (!value.endsWith('.com') && !value.endsWith('.edu') && !value.endsWith('.gov'))) {
+            (!value.endsWith('.com') &&
+                !value.endsWith('.edu') &&
+                !value.endsWith('.gov'))) {
           return "Invalid Email";
         }
         return null;
@@ -160,7 +162,7 @@ class _LoginScreen extends State<LoginScreen> {
         return _loginUser(loginData);
       },
       onSignup: (signupData) {
-        debugPrint('Signup info');
+        debugPrint('Sign up info');
         debugPrint('Email: ${signupData.name}');
         debugPrint('Password: ${signupData.password}');
 
@@ -189,23 +191,44 @@ class _LoginScreen extends State<LoginScreen> {
       },
       headerWidget: const IntroWidget(),
       theme: LoginTheme(
-          textFieldStyle: const TextStyle(color: Colors.black),
-          inputTheme: const InputDecorationTheme(
-            fillColor: Colors.white10,
-            iconColor: Colors.black,
+        textFieldStyle: const TextStyle(color: Colors.black),
+        inputTheme: const InputDecorationTheme(
+          fillColor: Colors.white10,
+          iconColor: Colors.black,
+          filled: true,
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.black26,
+              width: 1.5,
+            ),
           ),
-          accentColor: Colors.white,
-          switchAuthTextColor: Colors.black,
-          pageColorLight: Colors.blueAccent[400]!,
-          primaryColor: Colors.black,
-          pageColorDark: Colors.yellow[400]!,
-          titleStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.black26,
+              width: 1.5,
+            ),
           ),
-          cardTheme: const CardTheme(color: Colors.white)),
-    )));
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.black26,
+              width: 1.5,
+            ),
+          ),
+        ),
+        accentColor: Colors.white,
+        switchAuthTextColor: Colors.black,
+        pageColorLight: Colors.blueAccent[400]!,
+        primaryColor: Colors.black,
+        pageColorDark: Colors.yellow[400]!,
+        titleStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+        cardTheme: const CardTheme(color: Colors.white),
+      )
+
+            )));
   }
 }
 

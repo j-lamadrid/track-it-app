@@ -20,11 +20,36 @@ class _ContactListScreenState extends State<ContactListScreen> {
   bool _loading = true;
   bool _error = false;
   bool _isAuthorized = false;
+  DateTime? _startTime;
+
+  void _trackTimeSpent(String pageName) async {
+    if (_startTime != null) {
+      Duration timeSpent = DateTime.now().difference(_startTime!);
+      String userId = _auth.currentUser!.uid;
+      DocumentReference pageDoc = _firestore
+          .collection('stats')
+          .doc(userId)
+          .collection(pageName)
+          .doc('stats');
+
+      // Update time spent in Firestore
+      pageDoc.set({
+        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+      }, SetOptions(merge: true));
+    }
+  }
+
+  @override
+  void dispose() {
+    _trackTimeSpent('Contact Us');
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
     _fetchContacts();
+    _startTime = DateTime.now();
   }
 
   Future<void> _fetchContacts() async {

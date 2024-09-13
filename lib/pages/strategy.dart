@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class StrategyPage extends StatefulWidget {
@@ -10,6 +12,40 @@ class StrategyPage extends StatefulWidget {
 }
 
 class _StrategyPage extends State<StrategyPage> {
+
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  DateTime? _startTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTime = DateTime.now();
+  }
+
+  void _trackTimeSpent(String pageName) async {
+    if (_startTime != null) {
+      Duration timeSpent = DateTime.now().difference(_startTime!);
+      String userId = _auth.currentUser!.uid;
+      DocumentReference pageDoc = _firestore
+          .collection('stats')
+          .doc(userId)
+          .collection(pageName)
+          .doc('stats');
+
+      // Update time spent in Firestore
+      pageDoc.set({
+        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+      }, SetOptions(merge: true));
+    }
+  }
+
+  @override
+  void dispose() {
+    _trackTimeSpent('ASE Strategies');
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

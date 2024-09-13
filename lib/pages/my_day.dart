@@ -39,11 +39,32 @@ class _MyDayPage extends State<MyDayPage> {
 
   late SharedPreferences _prefs;
   final String _dateKey = 'last_saved_date';
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  DateTime? _startTime;
 
   @override
   void initState() {
     super.initState();
     _loadSavedState();
+    _startTime = DateTime.now();
+  }
+
+  void _trackTimeSpent(String pageName) async {
+    if (_startTime != null) {
+      Duration timeSpent = DateTime.now().difference(_startTime!);
+      String userId = _auth.currentUser!.uid;
+      DocumentReference pageDoc = _firestore
+          .collection('stats')
+          .doc(userId)
+          .collection(pageName)
+          .doc('stats');
+
+      // Update time spent in Firestore
+      pageDoc.set({
+        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+      }, SetOptions(merge: true));
+    }
   }
 
   void _loadSavedState() async {
@@ -77,6 +98,7 @@ class _MyDayPage extends State<MyDayPage> {
   @override
   void dispose() {
     _saveState();
+    _trackTimeSpent('Times of Day');
     super.dispose();
   }
 

@@ -18,18 +18,44 @@ class _TrendsPageState extends State<TrendsPage> {
   List<Map<String, dynamic>> _pieData = [];
   bool _loading = true;
   String _selectedRange = 'Past 7 Days';
-  final String _selectedScale = 'Turns Taken';
   int _turnsLastWeek = 0;
   int _turnsWeekBeforeLast = 0;
   bool _isTurnTrendUp = false;
   bool _loadingTurnTrend = true;
   String _percentChange = '';
+  DateTime? _startTime;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+
+  void _trackTimeSpent(String pageName) async {
+    if (_startTime != null) {
+      Duration timeSpent = DateTime.now().difference(_startTime!);
+      String userId = _auth.currentUser!.uid;
+      DocumentReference pageDoc = _firestore
+          .collection('stats')
+          .doc(userId)
+          .collection(pageName)
+          .doc('stats');
+
+      // Update time spent in Firestore
+      pageDoc.set({
+        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+      }, SetOptions(merge: true));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _startTime = DateTime.now();
     _fetchAndProcessData();
     _loadPieData();
+  }
+
+  @override
+  void dispose() {
+    _trackTimeSpent('Trends');
+    super.dispose();
   }
 
   double dp(double val, int places) {

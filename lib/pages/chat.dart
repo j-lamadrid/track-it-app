@@ -26,14 +26,39 @@ class _ChatterScreenState extends State<ChatterScreen> {
   String? receiverName;
   String? channelId;
   String messageText = '';
+  DateTime? _startTime;
+
+  void _trackTimeSpent(String pageName) async {
+    if (_startTime != null) {
+      Duration timeSpent = DateTime.now().difference(_startTime!);
+      String userId = _auth.currentUser!.uid;
+      DocumentReference pageDoc = _firestore
+          .collection('stats')
+          .doc(userId)
+          .collection(pageName)
+          .doc('stats');
+
+      // Update time spent in Firestore
+      pageDoc.set({
+        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+      }, SetOptions(merge: true));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _startTime = DateTime.now();
     userId = _auth.currentUser!.uid;
     receiverId = widget.receiverId;
     chatName = widget.chatName;
     _fetchReceiverName();
+  }
+
+  @override
+  void dispose() {
+    _trackTimeSpent('Contact Us');
+    super.dispose();
   }
 
   Future<void> _fetchReceiverName() async {
