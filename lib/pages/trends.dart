@@ -39,7 +39,8 @@ class _TrendsPageState extends State<TrendsPage> {
 
       // Update time spent in Firestore
       pageDoc.set({
-        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+        'time': FieldValue.increment(timeSpent.inSeconds),
+        // Add seconds to time
       }, SetOptions(merge: true));
     }
   }
@@ -401,25 +402,28 @@ class _TrendsPageState extends State<TrendsPage> {
                           shouldAlwaysShow: false,
                           activationMode: ActivationMode.singleTap),
                       primaryXAxis: CategoryAxis(
-                        //title: AxisTitle(text: 'Date'),
-                        labelRotation: 45,
-                        autoScrollingMode: AutoScrollingMode.end,
-                        labelIntersectAction: AxisLabelIntersectAction.rotate45,
+                          //title: AxisTitle(text: 'Date'),
+                          labelRotation: 45,
+                          autoScrollingMode: AutoScrollingMode.end,
+                          labelIntersectAction:
+                              AxisLabelIntersectAction.rotate45,
                           axisLine: const AxisLine(color: Colors.black26),
                           labelStyle: const TextStyle(color: Colors.black),
-                          majorGridLines: const MajorGridLines(color: Colors.black12)
-                      ),
+                          majorGridLines:
+                              const MajorGridLines(color: Colors.black12)),
                       primaryYAxis: NumericAxis(
-                        //title: AxisTitle(text: 'Count'),
-                        autoScrollingMode: AutoScrollingMode.end,
-                        labelIntersectAction: AxisLabelIntersectAction.rotate45,
+                          //title: AxisTitle(text: 'Count'),
+                          autoScrollingMode: AutoScrollingMode.end,
+                          labelIntersectAction:
+                              AxisLabelIntersectAction.rotate45,
                           axisLine: const AxisLine(color: Colors.black26),
                           labelStyle: const TextStyle(color: Colors.black),
-                          majorGridLines: const MajorGridLines(color: Colors.black12)
-                      ),
+                          majorGridLines:
+                              const MajorGridLines(color: Colors.black12)),
                       title: ChartTitle(
                           text: 'Trends in Turn Taking',
-                          textStyle: const TextStyle(fontWeight: FontWeight.bold)),
+                          textStyle:
+                              const TextStyle(fontWeight: FontWeight.bold)),
                       series: <LineSeries<Map<String, dynamic>, String>>[
                         LineSeries<Map<String, dynamic>, String>(
                           dataSource: _data,
@@ -464,21 +468,21 @@ class _TrendsPageState extends State<TrendsPage> {
                       //plotAreaBackgroundColor: Colors.black12,
                       title: ChartTitle(
                           text: 'Turn Taking/Time Spent: $_selectedRange',
-                          textStyle: const TextStyle(fontWeight: FontWeight.bold)
-                      ),
+                          textStyle:
+                              const TextStyle(fontWeight: FontWeight.bold)),
                       primaryXAxis: CategoryAxis(
-                        isInversed: true,
-                        borderColor: Colors.black,
+                          isInversed: true,
+                          borderColor: Colors.black,
                           axisLine: const AxisLine(color: Colors.black26),
                           labelStyle: const TextStyle(color: Colors.black),
-                          majorGridLines: const MajorGridLines(color: Colors.black12)
-                      ),
+                          majorGridLines:
+                              const MajorGridLines(color: Colors.black12)),
                       primaryYAxis: NumericAxis(
                           borderColor: Colors.black,
                           axisLine: const AxisLine(color: Colors.black26),
                           labelStyle: const TextStyle(color: Colors.black),
-                          majorGridLines: const MajorGridLines(color: Colors.black12)
-                      ),
+                          majorGridLines:
+                              const MajorGridLines(color: Colors.black12)),
                       series: <BarSeries>[
                         BarSeries<Map<String, dynamic>, String>(
                           legendIconType: LegendIconType.rectangle,
@@ -502,7 +506,7 @@ class _TrendsPageState extends State<TrendsPage> {
                         ),
                       ],
                       legend: const Legend(
-                          isVisible: true,
+                        isVisible: true,
                         position: LegendPosition.top,
                       ),
                       tooltipBehavior: TooltipBehavior(enable: true),

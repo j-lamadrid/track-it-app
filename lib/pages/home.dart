@@ -40,7 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }, SetOptions(merge: true));
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -360,6 +359,19 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
+                  const Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 50, 15, 0),
+                      child: Text(
+                        'v0.4.5',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

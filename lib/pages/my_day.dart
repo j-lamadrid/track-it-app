@@ -62,7 +62,8 @@ class _MyDayPage extends State<MyDayPage> {
 
       // Update time spent in Firestore
       pageDoc.set({
-        'time': FieldValue.increment(timeSpent.inSeconds), // Add seconds to time
+        'time': FieldValue.increment(timeSpent.inSeconds),
+        // Add seconds to time
       }, SetOptions(merge: true));
     }
   }
@@ -219,7 +220,8 @@ class _MyDayPage extends State<MyDayPage> {
                         2: FlexColumnWidth(4),
                         3: FlexColumnWidth(4),
                       },
-                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
                       border: TableBorder.all(
                         color: Colors.white10,
                         width: 1,

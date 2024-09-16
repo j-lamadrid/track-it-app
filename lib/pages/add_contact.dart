@@ -38,18 +38,22 @@ class _AddContactScreenState extends State<AddContactScreen> {
       if (currentUser != null) {
         String userId = currentUser.uid;
 
-        DocumentSnapshot contactsSnapshot = await _firestore.collection('contacts').doc(userId).get();
-        Map<String, dynamic>? contactsData = contactsSnapshot.data() as Map<String, dynamic>?;
+        DocumentSnapshot contactsSnapshot =
+            await _firestore.collection('contacts').doc(userId).get();
+        Map<String, dynamic>? contactsData =
+            contactsSnapshot.data() as Map<String, dynamic>?;
         if (contactsData != null) {
           setState(() {
             _addedUserIds = contactsData.keys.toSet();
           });
         }
 
-        QuerySnapshot usersSnapshot = await _firestore.collection('users').get();
+        QuerySnapshot usersSnapshot =
+            await _firestore.collection('users').get();
         setState(() {
           _users = usersSnapshot.docs
-              .where((doc) => doc.id != userId && !_addedUserIds.contains(doc.id))
+              .where(
+                  (doc) => doc.id != userId && !_addedUserIds.contains(doc.id))
               .toList();
           _filteredUsers = _users; // Initialize filtered list
           _loading = false;
@@ -108,17 +112,20 @@ class _AddContactScreenState extends State<AddContactScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(), // Close dialog without action
+              onPressed: () => Navigator.of(context).pop(),
+              // Close dialog without action
               child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog and proceed with adding
+                Navigator.of(context)
+                    .pop(); // Close dialog and proceed with adding
                 if (selectedProviderType != null) {
                   _addContact(otherUserId, selectedProviderType!);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please select a provider type')),
+                    const SnackBar(
+                        content: Text('Please select a provider type')),
                   );
                 }
               },
@@ -136,23 +143,28 @@ class _AddContactScreenState extends State<AddContactScreen> {
       if (currentUser != null) {
         String userId = currentUser.uid;
 
-        DocumentReference newChannelRef = _firestore.collection('messages').doc();
+        DocumentReference newChannelRef =
+            _firestore.collection('messages').doc();
         String channelId = newChannelRef.id;
 
         // Adding provider type when creating the contact
         await _firestore.collection('contacts').doc(userId).set(
-          {otherUserId: {'channelId': channelId,
-            'type': providerType != 'Other'
-              ? providerType
-              : ''}},
+          {
+            otherUserId: {
+              'channelId': channelId,
+              'type': providerType != 'Other' ? providerType : ''
+            }
+          },
           SetOptions(merge: true),
         );
 
         await _firestore.collection('contacts').doc(otherUserId).set(
-          {userId: {'channelId': channelId,
-            'type': providerType != 'Other'
-                ? providerType
-                : ''}},
+          {
+            userId: {
+              'channelId': channelId,
+              'type': providerType != 'Other' ? providerType : ''
+            }
+          },
           SetOptions(merge: true),
         );
 
@@ -202,46 +214,47 @@ class _AddContactScreenState extends State<AddContactScreen> {
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : _error
-            ? const Center(child: Text('Error fetching users'))
-            : Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: 'Search Users',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  prefixIcon: const Icon(Icons.search),
-                ),
-              ),
-            ),
-            Expanded(
-              child: _filteredUsers.isEmpty
-                  ? const Center(child: Text('No users available'))
-                  : ListView.builder(
-                itemCount: _filteredUsers.length,
-                itemBuilder: (context, index) {
-                  var user = _filteredUsers[index];
-                  String username = user['username'] ?? 'Unknown';
-                  String userId = user.id;
+                ? const Center(child: Text('Error fetching users'))
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            labelText: 'Search Users',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            prefixIcon: const Icon(Icons.search),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: _filteredUsers.isEmpty
+                            ? const Center(child: Text('No users available'))
+                            : ListView.builder(
+                                itemCount: _filteredUsers.length,
+                                itemBuilder: (context, index) {
+                                  var user = _filteredUsers[index];
+                                  String username =
+                                      user['username'] ?? 'Unknown';
+                                  String userId = user.id;
 
-                  return ListTile(
-                    title: Text(username),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () => _showProviderTypeDialog(userId),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                                  return ListTile(
+                                    title: Text(username),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.add),
+                                      onPressed: () =>
+                                          _showProviderTypeDialog(userId),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
       ),
     );
   }
 }
-
