@@ -362,9 +362,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Align(
                     alignment: Alignment.bottomRight,
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 50, 15, 0),
+                      padding: EdgeInsets.fromLTRB(0, 70, 15, 0),
                       child: Text(
-                        'v0.4.5',
+                        'v0.4.6',
                         style: TextStyle(
                           fontSize: 10,
                           color: Colors.black54,

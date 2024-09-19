@@ -54,3 +54,9 @@
 - Order by most recent message
 - Add notification of message
 - Mark providers (i.e. Primary Therapist, Secondary, etc.)
+
+## Exporting Data
+
+From this repository, in your terminal/command prompt run:
+
+`python export.py \path\to\credentials.json {collection_name}`
